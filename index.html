@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旅客分類大解密 | 旅遊與款待 (中四)</title>
+    <!-- Tailwind CSS (安全 CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome 圖標庫 (安全 CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Noto Sans TC (繁體中文美化) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'] },
+                    colors: {
+                        thm_blue: '#2563eb',   // Royal Blue
+                        thm_orange: '#f97316', // Orange
+                        thm_green: '#16a34a',  // Green
+                        thm_dark: '#1e293b'    // Slate 800
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f0fdf4; scroll-behavior: smooth; }
+        .hide { display: none !important; }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Flip Card - 翻牌特效 */
+        .flip-card { background-color: transparent; height: 230px; perspective: 1000px; cursor: pointer; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; }
+        .flip-card-front { background-color: white; color: #1e293b; border: 2px solid #e2e8f0; }
+        .flip-card-back { color: white; transform: rotateY(180deg); }
+
+        /* Match Game - 配對遊戲 */
+        .match-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .match-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .match-btn.selected { background-color: #f97316; color: white; border-color: #f97316; transform: scale(1.02); }
+        .match-btn.matched { background-color: #16a34a; color: white; border-color: #16a34a; opacity: 0.6; pointer-events: none; transform: scale(0.98); }
+        .match-btn.error { background-color: #ef4444; color: white; border-color: #ef4444; animation: shake 0.5s; }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 20%, 60% {transform: translateX(-5px);} 40%, 80% {transform: translateX(5px);} }
+
+        /* Vocab Item - 單字卡特效 */
+        .vocab-item { transition: all 0.2s; }
+        .vocab-item:hover { transform: translateX(5px); border-left-color: #2563eb; }
+
+        /* Progress Bar - 進度條 */
+        #progress-bar { transition: width 0.4s ease; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Navbar & Progress -->
+    <nav class="fixed top-0 w-full bg-white shadow-md z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="font-black text-xl text-thm_blue flex items-center gap-2">
+                <i class="fa-solid fa-passport"></i> 旅遊與款待：旅客分類大解密
+            </div>
+            <div class="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full" id="progress-text">準備出發</div>
+        </div>
+        <div class="h-2 w-full bg-slate-100">
+            <div id="progress-bar" class="h-2 bg-thm_orange w-0 rounded-r-full"></div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="max-w-5xl mx-auto px-4 pt-24 pb-20">
+        
+        <!-- Section 0: 課前導入 (Introduction) -->
+        <section id="sec-0" class="section-container flex flex-col items-center justify-center min-h-[75vh] text-center fade-in">
+            <div class="w-32 h-32 mb-6 bg-blue-100 rounded-full p-4 shadow-lg flex items-center justify-center">
+                <i class="fa-solid fa-earth-asia text-6xl text-thm_blue"></i>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-black text-thm_dark mb-6 tracking-wide">誰才是真正的「旅客」？</h1>
+            
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-200 max-w-2xl text-left mb-8">
+                <h3 class="text-xl font-bold text-thm_blue mb-4"><i class="fa-solid fa-book-open"></i> 課前小故事</h3>
+                <p class="text-slate-700 leading-relaxed mb-4">
+                    阿明一家人最近都在「移動」：<br>
+                    👨 <strong>爸爸：</strong>每天從上水搭火車到金鐘辦公室上班。<br>
+                    👦 <strong>阿明：</strong>星期六跟同學搭船到澳門吃葡撻，晚上即日回港。<br>
+                    👩 <strong>媽媽：</strong>飛去日本東京血拼探朋友，在當地住四晚溫泉旅館。<br>
+                    🧳 <strong>大伯：</strong>從加拿大搭飛機回香港探親，留港居住了兩個月。
+                </p>
+                <div class="bg-orange-50 border-l-4 border-thm_orange p-4 rounded">
+                    <p class="font-bold text-thm_orange mb-1">思考問題：</p>
+                    <p class="text-sm">他們都在進行空間移動，但根據<strong>聯合國世界旅遊組織 (UNWTO)</strong> 的國際定義，他們全都是「旅客」嗎？他們之間有什麼本質上的差別？</p>
+                </div>
+            </div>
+
+            <button onclick="navTo(1)" class="bg-thm_blue hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 text-lg flex items-center gap-2">
+                開始探索 <i class="fa-solid fa-plane-departure"></i>
+            </button>
+        </section>
+
+        <!-- Section 1: 重點教學 - 基本概念 -->
+        <section id="sec-1" class="section-container hide fade-in">
+            <h2 class="text-3xl font-black mb-6 text-thm_dark border-l-6 border-thm_blue pl-4">1. 旅客定義與分類基礎</h2>
+            <p class="text-slate-600 mb-8 text-lg">要準確統計旅遊業數據，必須釐清「訪客」、「過夜旅客」與「短程旅客」的界限。點擊卡片翻轉看詳細定義！</p>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-10">
+                <!-- Card 1 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fa-solid fa-users text-5xl text-blue-500 mb-4"></i>
+                            <h4 class="font-bold text-2xl">訪客 (Visitor)</h4>
+                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
+                        </div>
+                        <div class="flip-card-back bg-blue-600">
+                            <h4 class="font-bold text-xl mb-3">訪客 (Visitor)</h4>
+                            <p class="text-sm px-2">離開日常環境（原居地），前往另一目的地（逗留少於一年），其主要旅行目的並非在當地從事受薪工作的人。<br><br><strong>(這是一個最廣義的統稱)</strong></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fa-solid fa-bed text-5xl text-green-500 mb-4"></i>
+                            <h4 class="font-bold text-2xl">過夜旅客</h4>
+                            <h5 class="text-lg text-slate-500">(Tourist / Overnight)</h5>
+                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
+                        </div>
+                        <div class="flip-card-back bg-green-600">
+                            <h4 class="font-bold text-xl mb-3">過夜旅客 (Tourist)</h4>
+                            <p class="text-sm px-2">在旅遊目的地逗留 <strong>24 小時或以上</strong>，並且在當地的集體或私人住宿設施（如酒店、青年旅舍、親友家）<strong>最少過夜一次</strong>的訪客。</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <i class="fa-solid fa-clock text-5xl text-orange-500 mb-4"></i>
+                            <h4 class="font-bold text-2xl">短程 / 不過夜旅客</h4>
+                            <h5 class="text-lg text-slate-500">(Excursionist / Same-day)</h5>
+                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
+                        </div>
+                        <div class="flip-card-back bg-orange-500">
+                            <h4 class="font-bold text-xl mb-3">短程旅客 (Excursionist)</h4>
+                            <p class="text-sm px-2">在目的地逗留 <strong>少於 24 小時</strong>，並且<strong>沒有</strong>在當地住宿設施過夜的訪客。<br>(例如：即日往返的購物客、郵輪靠岸觀光的過境乘客)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 flex gap-4 items-start">
+                <i class="fa-solid fa-circle-question text-3xl text-thm_blue mt-1"></i>
+                <div>
+                    <h4 class="font-bold text-lg mb-1">對照故事答案：</h4>
+                    <p class="text-slate-700">
+                        爸爸是日常通勤（不屬訪客）；阿明是<strong>短程旅客 (Excursionist)</strong>；媽媽和大伯則屬於<strong>過夜旅客 (Tourist)</strong>！
+                    </p>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button onclick="navTo(0)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
+                <button onclick="navTo(2)" class="btn-primary">下一步：旅遊流向 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Section 2: 重點教學 - 旅遊流向 -->
+        <section id="sec-2" class="section-container hide fade-in">
+            <h2 class="text-3xl font-black mb-6 text-thm_dark border-l-6 border-thm_green pl-4">2. 根據流向分類</h2>
+            <p class="text-slate-600 mb-8 text-lg">旅客流向分為入境、出境和國內。這對評估一個地區的旅遊經濟平衡（收支）至關重要。</p>
+            
+            <div class="relative max-w-3xl mx-auto my-12">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
+                    
+                    <!-- Outbound -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_blue w-full text-center">
+                        <i class="fa-solid fa-plane-departure text-4xl text-thm_blue mb-3"></i>
+                        <h3 class="font-bold text-xl mb-2">出境旅遊<br><span class="text-sm text-slate-500">Outbound Tourism</span></h3>
+                        <p class="text-sm text-slate-600">本國居民跨越邊境前往其他國家或地區。</p>
+                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
+                            <strong>香港視角：</strong>香港居民出發去日本東京。
+                        </div>
+                    </div>
+
+                    <!-- Domestic -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_orange w-full text-center transform md:-translate-y-6">
+                        <i class="fa-solid fa-map-location-dot text-4xl text-thm_orange mb-3"></i>
+                        <h3 class="font-bold text-xl mb-2">國內旅遊<br><span class="text-sm text-slate-500">Domestic Tourism</span></h3>
+                        <p class="text-sm text-slate-600">本國居民在本國境內旅遊，不跨越國境。</p>
+                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
+                            <strong>香港視角：</strong>市區居民去長洲或大澳度假。
+                        </div>
+                    </div>
+
+                    <!-- Inbound -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_green w-full text-center">
+                        <i class="fa-solid fa-plane-arrival text-4xl text-thm_green mb-3"></i>
+                        <h3 class="font-bold text-xl mb-2">入境旅遊<br><span class="text-sm text-slate-500">Inbound Tourism</span></h3>
+                        <p class="text-sm text-slate-600">非本國居民跨越邊境進入本國或目的地地區。</p>
+                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
+                            <strong>香港視角：</strong>英國遊客抵達香港國際機場。
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button onclick="navTo(1)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
+                <button onclick="navTo(3)" class="btn-primary">下一步：語音詞彙庫 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Section 3: 語音詞彙庫 (Vocab & TTS) -->
+        <section id="sec-3" class="section-container hide fade-in">
+            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-purple-500 pl-4">3. 專業詞彙發音庫 (Vocabulary List)</h2>
+            <p class="text-slate-600 mb-6 text-lg">學好英語專業名詞是旅遊科的關鍵！點擊喇叭即可聆聽純正發音，並提供自主跟讀段落。</p>
+
+            <!-- TTS Controls for reading aloud -->
+            <div class="bg-purple-50 p-5 rounded-xl border border-purple-100 mb-8">
+                <h3 class="font-bold text-lg mb-2 text-purple-800 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open-reader"></i> 段落跟讀挑戰 (Reading Aloud)
+                </h3>
+                <p class="text-slate-700 mb-4 leading-relaxed text-base" id="reading-text">
+                    According to the UNWTO, a <strong>visitor</strong> is a traveler taking a trip to a main destination outside his/her usual environment. Visitors are classified into <strong>tourists</strong> (overnight visitors) and <strong>excursionists</strong> (same-day visitors). Understanding the difference between <strong>inbound</strong> and <strong>outbound</strong> tourism is crucial for analyzing a country's tourism balance.
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="playParagraph()" id="btn-para-play" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm transition"><i class="fa-solid fa-play"></i> 朗讀此段落</button>
+                    <button onclick="stopTTS()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition"><i class="fa-solid fa-stop"></i> 停止播放</button>
+                </div>
+            </div>
+
+            <!-- Vocab Grid (12 items) -->
+            <div class="grid md:grid-cols-2 gap-4" id="vocab-container">
+                <!-- Javascript will load 12 items here -->
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button onclick="navTo(2)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
+                <button onclick="navTo(4)" class="btn-primary">下一步：配對挑戰 <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Section 4: 鞏固活動 (Matching) -->
+        <section id="sec-4" class="section-container hide fade-in">
+            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-pink-500 pl-4">4. 互動配對：旅客類型配對</h2>
+            <p class="text-slate-600 mb-6 text-lg">考驗你的邏輯分析！請先點選左方的「生活情境」，再點選右方對應的「旅客類型」進行連線。</p>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- Left Column (Scenarios) -->
+                    <div class="flex flex-col gap-3" id="match-left">
+                        <!-- Loaded by JS -->
+                    </div>
+                    <!-- Right Column (Types) -->
+                    <div class="flex flex-col gap-3" id="match-right">
+                        <!-- Loaded by JS -->
+                    </div>
+                </div>
+                <div id="match-msg" class="mt-6 text-center font-bold text-xl min-h-[30px]"></div>
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button onclick="navTo(3)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
+                <button onclick="navTo(5)" class="btn-primary">下一步：互動檢測 (5題) <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </section>
+
+        <!-- Section 5: 互動練習 (5 MCQs) -->
+        <section id="sec-5" class="section-container hide fade-in">
+            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-yellow-500 pl-4">5. 即時回饋檢測 (5 題多項選擇題)</h2>
+            <p class="text-slate-600 mb-6 text-lg">選擇正確答案後，系統會即時提供詳盡的解析回饋！</p>
+            
+            <div class="space-y-6" id="mcq-container">
+                <!-- MCQs generated dynamically -->
+            </div>
+
+            <div class="mt-10 flex justify-between">
+                <button onclick="navTo(4)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
+                <button onclick="navTo(6)" class="bg-thm_green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition transform hover:-translate-y-1">前往總結反思 <i class="fa-solid fa-flag-checkered"></i></button>
+            </div>
+        </section>
+
+        <!-- Section 6: 總結反思 -->
+        <section id="sec-6" class="section-container hide flex flex-col items-center min-h-[70vh] fade-in pt-10">
+            <div class="text-6xl mb-4 text-thm_orange"><i class="fa-solid fa-clipboard-question"></i></div>
+            <h2 class="text-4xl font-black text-thm_dark mb-4 text-center">單元完結與反思學習</h2>
+            <p class="text-lg text-slate-600 mb-8 max-w-2xl text-center">太棒了！你已成功完成了「旅客分類」的所有學術重點與互動練習。請完成以下兩個開放式反思問題：</p>
+            
+            <div class="w-full max-w-3xl space-y-6 text-left">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-thm_blue">
+                    <h3 class="font-bold text-lg mb-2 text-thm_dark">反思問題 (一)</h3>
+                    <p class="text-slate-600 mb-3">試回想你最近一次旅行（可以是離港或在本地郊遊）。根據本課所學的定義，你屬於哪一類旅客？這類型的旅客在目的地最常產生的消費行為是什麼？</p>
+                    <textarea id="reflect-1" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-thm_blue text-slate-700 resize-none" rows="3" placeholder="請將你的反思寫在這裡..."></textarea>
+                </div>
+                
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-thm_orange">
+                    <h3 class="font-bold text-lg mb-2 text-thm_dark">反思問題 (二)</h3>
+                    <p class="text-slate-600 mb-3">當大批「短程旅客 (Excursionist)」當天往返一個熱門旅遊景點（例如大嶼山大澳或尖沙咀），會對當地的「社區居民生活環境」與「經濟收益」帶來什麼好處與壞處？</p>
+                    <textarea id="reflect-2" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-thm_orange text-slate-700 resize-none" rows="4" placeholder="請寫出你的利弊分析與看法..."></textarea>
+                </div>
+            </div>
+
+            <!-- Download PDF Button / Save Option -->
+            <div class="mt-8 flex gap-4">
+                <button onclick="saveFeedback()" class="bg-thm_blue hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow">儲存答案到本地</button>
+            </div>
+
+            <button onclick="navTo(0)" class="mt-10 text-thm_blue font-bold hover:underline flex items-center gap-2">
+                <i class="fa-solid fa-rotate-left"></i> 返回起點重新學習
+            </button>
+        </section>
+
+    </main>
+
+    <script>
+        // --- Shared Tailwind Button Classes Dynamic Append ---
+        const btnStyle = document.createElement('style');
+        btnStyle.innerHTML = `
+            .btn-primary { background-color: #2563eb; color: white; font-weight: bold; padding: 0.75rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+            .btn-primary:hover { background-color: #1d4ed8; transform: translateY(-2px); }
+            .btn-secondary { color: #64748b; font-weight: bold; padding: 0.75rem 1.5rem; transition: color 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
+            .btn-secondary:hover { color: #2563eb; }
+        `;
+        document.head.appendChild(btnStyle);
+
+        // --- Navigation Logic ---
+        const totalSections = 6;
+        
+        function navTo(step) {
+            document.querySelectorAll('.section-container').forEach(sec => sec.classList.add('hide'));
+            document.getElementById(`sec-${step}`).classList.remove('hide');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Update Progress Bar
+            const progress = (step / totalSections) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            const titles = ["準備出發", "概念基礎", "旅遊流向", "詞彙寶庫", "配對挑戰", "MC測驗", "總結反思"];
+            document.getElementById('progress-text').innerText = step === 0 ? titles[0] : `${titles[step]} (${Math.round(progress)}%)`;
+
+            stopTTS(); // Automatic stop audio when navigating
+        }
+
+        // --- 12 Key Vocabulary Items Data ---
+        const vocabList = [
+            { en: "Visitor", pos: "n.", zh: "訪客", enDef: "Any person traveling to a place outside his/her usual environment.", zhDef: "離開日常環境，前往另一地方不超過一年的訪客（最廣泛統稱）。", tip: "Vi-si-tor" },
+            { en: "Tourist", pos: "n.", zh: "過夜旅客", enDef: "A visitor who stays at least one night in the destination.", zhDef: "在目的地停留最少一晚（24小時或以上）的過夜旅客。", tip: "Too-rist" },
+            { en: "Excursionist", pos: "n.", zh: "短程旅客 / 不過夜旅客", enDef: "A same-day visitor who does not spend the night in the destination.", zhDef: "在目的地停留少於24小時，且不過夜的旅客。", tip: "Ex-cur-sion-ist" },
+            { en: "Inbound Tourism", pos: "n.", zh: "入境旅遊", enDef: "Non-residents traveling in the given country.", zhDef: "非原居地居民（外地遊客）進入本國旅遊。", tip: "In-bound" },
+            { en: "Outbound Tourism", pos: "n.", zh: "出境旅遊", enDef: "Residents of a country traveling to another country.", zhDef: "本國居民離開本國前往其他國家或地區旅遊。", tip: "Out-bound" },
+            { en: "Domestic Tourism", pos: "n.", zh: "國內旅遊", enDef: "Residents of a given country traveling within that country.", zhDef: "本國或地區居民在自己國家/地區範圍內旅遊。", tip: "Do-mes-tic" },
+            { en: "Leisure Tourism", pos: "n.", zh: "消閒旅遊", enDef: "Traveling for pleasure, relaxation, holidays, or recreation.", zhDef: "以度假、娛樂、休閒放鬆為主要目的的旅遊活動。", tip: "Lei-sure" },
+            { en: "Business Tourism", pos: "n.", zh: "商務旅遊", enDef: "Travel for commercial or professional purposes.", zhDef: "因公幹、出席商務會議或展覽而進行的旅遊活動。", tip: "Busi-ness" },
+            { en: "VFR", pos: "phr.", zh: "探訪親友", enDef: "Visiting Friends and Relatives.", zhDef: "以探望居住在外地的親戚或朋友為主要動機的旅行。", tip: "V-F-R" },
+            { en: "Destination", pos: "n.", zh: "旅遊目的地", enDef: "The final place to which a traveler is going.", zhDef: "旅客旅程的終點站，即吸引旅客前往觀光的地區。", tip: "Des-ti-na-tion" },
+            { en: "Usual Environment", pos: "n.", zh: "日常環境 / 原居地", enDef: "The geographical area where a person lives and works regularly.", zhDef: "個人生活、工作、上學的固定地理範圍。", tip: "U-sual En-vi-ron-ment" },
+            { en: "Length of Stay", pos: "n.", zh: "逗留時間", enDef: "The total number of days or nights spent at a destination.", zhDef: "旅客在目的地停留的時間總和，是觀光數據重要指標。", tip: "Length of stay" }
+        ];
+
+        // Dynamic render vocab cards
+        const vocabContainer = document.getElementById('vocab-container');
+        vocabList.forEach((v, index) => {
+            vocabContainer.innerHTML += `
+                <div class="vocab-item bg-white p-4 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-slate-300 relative group">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h4 class="text-lg font-bold text-thm_dark flex items-center gap-2">
+                                ${v.en} <span class="text-xs font-normal text-slate-400 italic">${v.pos}</span>
+                            </h4>
+                            <div class="text-sm text-thm_blue font-bold mt-1">${v.zh}</div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="playWord('${v.en}', 'en-US', 'v-en-${index}')" id="v-en-${index}" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition" title="English Pronunciation"><i class="fa-solid fa-volume-high"></i></button>
+                            <button onclick="playWord('${v.zh}', 'zh-HK', 'v-zh-${index}')" id="v-zh-${index}" class="w-8 h-8 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 flex items-center justify-center transition" title="廣東話朗讀"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-slate-500 mb-2 bg-slate-50 px-2 py-0.5 rounded inline-block"><i class="fa-solid fa-comment-dots text-slate-400"></i> 發音拼讀: ${v.tip}</div>
+                    <p class="text-xs text-slate-600 mb-1 leading-snug"><strong>英文解說:</strong> ${v.enDef}</p>
+                    <p class="text-xs text-slate-600 leading-snug"><strong>中文解說:</strong> ${v.zhDef}</p>
+                </div>
+            `;
+        });
+
+        // --- Web Speech API (TTS) Core JavaScript Logic ---
+        let synth = window.speechSynthesis;
+        let playingIconId = null;
+
+        function playWord(text, lang, btnId) {
+            stopTTS();
+            if (synth.speaking) return;
+
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.rate = 0.85; // Natural learning speed
+            
+            setVoiceAndLang(utterThis, lang);
+
+            utterThis.onstart = () => {
+                const btn = document.getElementById(btnId);
+                if(btn) { btn.innerHTML = '<i class="fa-solid fa-waveform fa-beat"></i>'; playingIconId = btnId; }
+            };
+            utterThis.onend = resetTTSBtns;
+            utterThis.onerror = resetTTSBtns;
+
+            synth.speak(utterThis);
+        }
+
+        function playParagraph() {
+            stopTTS();
+            const text = document.getElementById('reading-text').innerText;
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.rate = 0.8; // Clearer articulation for paragraph
+            setVoiceAndLang(utterThis, 'en-US');
+
+            const btn = document.getElementById('btn-para-play');
+            utterThis.onstart = () => {
+                btn.innerHTML = '<i class="fa-solid fa-waveform fa-beat"></i> 朗讀中...';
+                playingIconId = 'btn-para-play';
+                btn.classList.add('bg-purple-800');
+            };
+            utterThis.onend = () => {
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> 朗讀此段落';
+                btn.classList.remove('bg-purple-800');
+                playingIconId = null;
+            };
+            
+            synth.speak(utterThis);
+        }
+
+        function setVoiceAndLang(utterance, langPref) {
+            const voices = synth.getVoices();
+            let voice = null;
+            if (langPref === 'zh-HK') {
+                voice = voices.find(v => v.lang.includes('zh-HK')) || voices.find(v => v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh-CN'));
+            } else {
+                voice = voices.find(v => v.lang === 'en-US' || v.lang === 'en-GB') || voices.find(v => v.lang.includes('en'));
+            }
+            if (voice) { utterance.voice = voice; }
+            utterance.lang = langPref;
+        }
+
+        function stopTTS() {
+            synth.cancel();
+            resetTTSBtns();
+        }
+
+        function resetTTSBtns() {
+            if (playingIconId) {
+                const btn = document.getElementById(playingIconId);
+                if (btn) {
+                    if (playingIconId === 'btn-para-play') {
+                        btn.innerHTML = '<i class="fa-solid fa-play"></i> 朗讀此段落';
+                        btn.classList.remove('bg-purple-800');
+                    } else {
+                        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+                    }
+                }
+                playingIconId = null;
+            }
+        }
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => synth.getVoices();
+        }
+
+        // --- Data: Matching Game ---
+        const matchData = [
+            { id: "m1", scenario: "住在倫敦的約翰來香港迪士尼樂園遊玩三天", type: "入境過夜旅客" },
+            { id: "m2", scenario: "香港市民星期六去長洲郊遊，當天回市區", type: "國內短程旅客" },
+            { id: "m3", scenario: "香港中四學生去日本大阪進行五天修學旅行", type: "出境過夜旅客" },
+            { id: "m4", scenario: "深圳居民經羅湖來香港辦年貨，晚上回深圳", type: "入境短程旅客" }
+        ];
+
+        // Render matching columns
+        function initMatchGame() {
+            const leftCol = document.getElementById('match-left');
+            const rightCol = document.getElementById('match-right');
+            leftCol.innerHTML = ''; rightCol.innerHTML = '';
+            
+            const shuffledScenarios = [...matchData].sort(() => Math.random() - 0.5);
+            const shuffledTypes = [...matchData].sort(() => Math.random() - 0.5);
+
+            shuffledScenarios.forEach(item => {
+                leftCol.innerHTML += `<button class="match-btn border-2 border-slate-300 rounded-lg p-4 text-left bg-slate-50 font-medium text-sm md:text-base" data-id="${item.id}">${item.scenario}</button>`;
+            });
+
+            shuffledTypes.forEach(item => {
+                rightCol.innerHTML += `<button class="match-btn border-2 border-slate-300 rounded-lg p-4 font-bold text-center bg-slate-50 text-thm_blue text-sm md:text-base" data-id="${item.id}">${item.type}</button>`;
+            });
+
+            attachMatchListeners();
+        }
+
+        let selectedLeft = null;
+        let selectedRight = null;
+        let matchesCount = 0;
+
+        function attachMatchListeners() {
+            document.querySelectorAll('#match-left .match-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if(this.classList.contains('matched')) return;
+                    document.querySelectorAll('#match-left .match-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedLeft = this;
+                    checkMatch();
+                });
+            });
+
+            document.querySelectorAll('#match-right .match-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if(this.classList.contains('matched')) return;
+                    document.querySelectorAll('#match-right .match-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedRight = this;
+                    checkMatch();
+                });
+            });
+        }
+
+        function checkMatch() {
+            if (selectedLeft && selectedRight) {
+                const idLeft = selectedLeft.getAttribute('data-id');
+                const idRight = selectedRight.getAttribute('data-id');
+                const msgBox = document.getElementById('match-msg');
+
+                if (idLeft === idRight) {
+                    selectedLeft.className = "match-btn border-2 rounded-lg p-4 matched text-left text-sm md:text-base";
+                    selectedRight.className = "match-btn border-2 rounded-lg p-4 matched text-center text-sm md:text-base";
+                    selectedLeft = null; selectedRight = null;
+                    matchesCount++;
+                    msgBox.innerHTML = '<span class="text-thm_green fade-in"><i class="fa-solid fa-circle-check"></i> 配對正確！太棒了！</span>';
+
+                    if (matchesCount === matchData.length) {
+                        msgBox.innerHTML = '<span class="text-thm_orange text-2xl font-bold fade-in"><i class="fa-solid fa-trophy"></i> 精彩！全部配對挑戰成功！</span>';
+                    }
+                } else {
+                    selectedLeft.classList.add('error');
+                    selectedRight.classList.add('error');
+                    msgBox.innerHTML = '<span class="text-red-500 fade-in"><i class="fa-solid fa-circle-xmark"></i> 分類不符，請再思考一下關係！</span>';
+
+                    setTimeout(() => {
+                        if(selectedLeft) selectedLeft.classList.remove('error', 'selected');
+                        if(selectedRight) selectedRight.classList.remove('error', 'selected');
+                        selectedLeft = null; selectedRight = null;
+                        msgBox.innerHTML = '';
+                    }, 800);
+                }
+            }
+        }
+        initMatchGame();
+
+
+        // --- Data: 5 MCQs ---
+        const mcqData = [
+            {
+                q: "根據聯合國世界旅遊組織 (UNWTO)，區分「過夜旅客」和「短程旅客」的關鍵標準是什麼？",
+                opts: ["A. 旅遊目的 (消閒或商務)", "B. 逗留時間是否超過 24 小時並過夜", "C. 是否跨越國界", "D. 所選乘的交通工具"],
+                ans: 1,
+                exp: "正確！逗留時間在 24 小時或以上並在當地有住宿過夜的人為 Tourist (過夜旅客)，而少於 24 小時且不過夜的為 Excursionist (短程旅客)。"
+            },
+            {
+                q: "廣州居民王先生到上海出差 3 天，期間入住當地的商務酒店。對中國（目的地國）而言，王先生屬於：",
+                opts: ["A. 入境短程旅客", "B. 出境過夜旅客", "C. 國內過夜旅客", "D. 國際商務旅客"],
+                ans: 2,
+                exp: "正確！廣州和上海都在同一個國家（中國）內，因此屬於國內旅遊；他在當地過夜留宿，因此屬於過夜旅客。"
+            },
+            {
+                q: "瑪麗從紐約飛往悉尼，在香港國際機場過境區停留了 4 小時等待轉機，期間未辦理入境。她是否被界定為香港訪客？",
+                opts: ["A. 算，她是過境的短程旅客", "B. 算，她是國際入境旅客", "C. 不算，未通過邊境管制站進入地區的轉機乘客在法律與統計上不列為該地訪客", "D. 算，她帶來了機場消費"],
+                ans: 2,
+                exp: "正確！未通過出入境邊防管制站進入當地經濟領域的純轉機/過境旅客，不被計入目的地的訪客（Visitor）統計中。"
+            },
+            {
+                q: "一艘豪華郵輪早上停靠香港啟德碼頭，美籍遊客約翰下船到旺角購物，當晚返回郵輪艙房睡覺，郵輪次日駛離。約翰對香港而言是：",
+                opts: ["A. 國內過夜旅客", "B. 入境短程旅客 (Excursionist)", "C. 入境過夜旅客 (Tourist)", "D. 出境短程旅客"],
+                ans: 1,
+                exp: "正確！約翰跨越邊境進入香港（入境），但他晚上回到了移動的郵輪（非陸地固定住宿設施）睡覺，且留港少於24小時，應界定為短程旅客。"
+            },
+            {
+                q: "以下哪一項出行活動的主要目的，符合聯合國世界旅遊組織界定之「旅遊」活動範疇？",
+                opts: ["A. 前往鄰近城市的大學就讀為期四年的全日制課程", "B. 前往跨國公司的倫敦總部，受聘並開始為期兩年的工作合約", "C. 前往首爾進行為期四天的醫學美容與微整形手術", "D. 逃避內戰衝突跨越邊界尋求庇護的難民"],
+                ans: 2,
+                exp: "正確！醫療、消閒、商務公幹、探訪親友都屬於旅遊定義的範疇。而長期求學（超一年）、受僱於目的地（受薪工作）或非自願的強制遷移（如難民）皆非旅遊定義。 "
+            }
+        ];
+
+        // MCQ Rendering Engine with Instant Interactive Feedback
+        const mcqContainer = document.getElementById('mcq-container');
+        mcqData.forEach((item, index) => {
+            let optsHtml = '';
+            item.opts.forEach((opt, optIdx) => {
+                const isCorrect = (optIdx === item.ans);
+                optsHtml += `<button onclick="handleMCQ(this, ${isCorrect}, 'exp-${index}')" class="w-full text-left p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition bg-white font-medium text-sm md:text-base mcq-btn-${index}">${opt}</button>`;
+            });
+
+            mcqContainer.innerHTML += `
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <p class="font-bold text-lg text-thm_dark mb-4"><span class="text-thm_blue mr-2">Q${index + 1}.</span> ${item.q}</p>
+                    <div class="grid md:grid-cols-2 gap-3 mb-4">
+                        ${optsHtml}
+                    </div>
+                    <div id="exp-${index}" class="hidden p-4 rounded-lg text-sm font-medium fade-in"></div>
+                </div>
+            `;
+        });
+
+        function handleMCQ(btn, isCorrect, expId) {
+            const btnClass = Array.from(btn.classList).find(c => c.startsWith('mcq-btn-'));
+            const allBtns = document.querySelectorAll(`.${btnClass}`);
+            const expBox = document.getElementById(expId);
+            const qIndex = expId.split('-')[1];
+
+            // Lock and freeze options once clicked
+            allBtns.forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-60', 'cursor-not-allowed');
+                b.classList.remove('hover:bg-slate-50');
+            });
+
+            btn.classList.remove('opacity-60');
+            
+            if (isCorrect) {
+                btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                expBox.className = "p-4 rounded-lg text-sm font-bold bg-green-50 text-green-700 fade-in flex gap-2 items-start mt-4";
+                expBox.innerHTML = `<i class="fa-solid fa-circle-check mt-1 text-lg"></i> <div>【答案正確】<br>${mcqData[qIndex].exp}</div>`;
+            } else {
+                btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                expBox.className = "p-4 rounded-lg text-sm font-bold bg-red-50 text-red-700 fade-in flex gap-2 items-start mt-4";
+                expBox.innerHTML = `<i class="fa-solid fa-circle-xmark mt-1 text-lg"></i> <div>【答案錯誤】正確答案應為：${mcqData[qIndex].opts[mcqData[qIndex].ans]}。<br><span class="text-xs font-normal mt-1 inline-block">${mcqData[qIndex].exp}</span></div>`;
+                
+                // Highlight correct answer in green outline
+                allBtns[mcqData[qIndex].ans].classList.remove('opacity-60');
+                allBtns[mcqData[qIndex].ans].classList.add('border-green-500', 'border-2', 'bg-green-50');
+            }
+            expBox.classList.remove('hidden');
+        }
+
+        // --- Save Reflective Answers locally inside standard browser ---
+        function saveFeedback() {
+            const r1 = document.getElementById('reflect-1').value;
+            const r2 = document.getElementById('reflect-2').value;
+
+            if(!r1.trim() || !r2.trim()) {
+                alert("請填寫完反思問題的答案後再進行儲存！");
+                return;
+            }
+
+            // In Apps Script environment, direct file saving is sandboxed, so we store it in LocalStorage for persistence.
+            localStorage.setItem('tourism_reflect_1', r1);
+            localStorage.setItem('tourism_reflect_2', r2);
+            
+            alert("您的思考答案已成功儲存在此瀏覽器中！即使重新整理網頁也依然存在。");
+        }
+
+        // Restore stored reflect text on load
+        window.onload = function() {
+            if(localStorage.getItem('tourism_reflect_1')) {
+                document.getElementById('reflect-1').value = localStorage.getItem('tourism_reflect_1');
+            }
+            if(localStorage.getItem('tourism_reflect_2')) {
+                document.getElementById('reflect-2').value = localStorage.getItem('tourism_reflect_2');
+            }
+        }
+
+    </script>
+</body>
+</html>
