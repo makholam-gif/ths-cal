@@ -1,671 +1,1578 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-Hant-HK" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>旅客分類大解密 | 旅遊與款待 (中四)</title>
-    <!-- Tailwind CSS (安全 CDN) -->
+    <title>旅款之計算真簡單！DSE 計算題核心攻略與互動練習系統</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome 圖標庫 (安全 CDN) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Noto Sans TC (繁體中文美化) -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
+    <!-- Tailwind Theme Config -->
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['"Noto Sans TC"', 'sans-serif'] },
                     colors: {
-                        thm_blue: '#2563eb',   // Royal Blue
-                        thm_orange: '#f97316', // Orange
-                        thm_green: '#16a34a',  // Green
-                        thm_dark: '#1e293b'    // Slate 800
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        },
+                        accent: {
+                            emerald: '#10b981',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e',
+                            sky: '#0ea5e9'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #f0fdf4; scroll-behavior: smooth; }
-        .hide { display: none !important; }
-        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Flip Card - 翻牌特效 */
-        .flip-card { background-color: transparent; height: 230px; perspective: 1000px; cursor: pointer; }
-        .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
-        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 1.5rem; }
-        .flip-card-front { background-color: white; color: #1e293b; border: 2px solid #e2e8f0; }
-        .flip-card-back { color: white; transform: rotateY(180deg); }
-
-        /* Match Game - 配對遊戲 */
-        .match-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .match-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .match-btn.selected { background-color: #f97316; color: white; border-color: #f97316; transform: scale(1.02); }
-        .match-btn.matched { background-color: #16a34a; color: white; border-color: #16a34a; opacity: 0.6; pointer-events: none; transform: scale(0.98); }
-        .match-btn.error { background-color: #ef4444; color: white; border-color: #ef4444; animation: shake 0.5s; }
-        @keyframes shake { 0%, 100% {transform: translateX(0);} 20%, 60% {transform: translateX(-5px);} 40%, 80% {transform: translateX(5px);} }
-
-        /* Vocab Item - 單字卡特效 */
-        .vocab-item { transition: all 0.2s; }
-        .vocab-item:hover { transform: translateX(5px); border-left-color: #2563eb; }
-
-        /* Progress Bar - 進度條 */
-        #progress-bar { transition: width 0.4s ease; }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c7d2fe;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #818cf8;
+        }
+        /* Matching Game lines or transitions */
+        .match-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .correct-pulse {
+            animation: pulse-green 1s ease-in-out;
+        }
+        @keyframes pulse-green {
+            0%, 100% { border-color: #10b981; box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.4); }
+            50% { border-color: #059669; box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+        .wrong-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
     </style>
 </head>
-<body class="text-slate-800 antialiased">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
 
-    <!-- Navbar & Progress -->
-    <nav class="fixed top-0 w-full bg-white shadow-md z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="font-black text-xl text-thm_blue flex items-center gap-2">
-                <i class="fa-solid fa-passport"></i> 旅遊與款待：旅客分類大解密
+    <!-- Header Navigation Section -->
+    <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- Logo & Brand Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-brand-600 text-white rounded-xl shadow-md shadow-brand-500/20">
+                        <i class="fa-solid fa-calculator text-xl sm:text-2xl animate-pulse"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-brand-600 block">HKDSE 旅遊與款待</span>
+                        <h1 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">旅款之計算真簡單！</h1>
+                    </div>
+                </div>
+
+                <!-- Web Speech Audio Controls Global Status -->
+                <div class="flex items-center space-x-2">
+                    <div id="tts-indicator" class="hidden items-center space-x-1.5 px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-medium animate-bounce">
+                        <span class="w-2 h-2 rounded-full bg-brand-600 inline-block animate-ping"></span>
+                        <span>系統正在朗讀中...</span>
+                    </div>
+                    <button onclick="stopSpeech()" id="btn-stop-all" class="hidden px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-700 rounded-lg text-xs font-bold transition-colors items-center space-x-1">
+                        <i class="fa-solid fa-square"></i>
+                        <span>停止播放</span>
+                    </button>
+                    <!-- Language Selection -->
+                    <div class="relative inline-block text-left">
+                        <select id="tts-lang" class="bg-slate-100 border border-slate-300 text-slate-700 text-xs rounded-lg block p-2 outline-none focus:ring-2 focus:ring-brand-500 font-semibold cursor-pointer">
+                            <option value="zh-HK" selected>粵語 (廣東話)</option>
+                            <option value="zh-TW">國語 (普通話)</option>
+                            <option value="en-US">英語 (English)</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-            <div class="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full" id="progress-text">準備出發</div>
         </div>
-        <div class="h-2 w-full bg-slate-100">
-            <div id="progress-bar" class="h-2 bg-thm_orange w-0 rounded-r-full"></div>
+        <!-- Progress bar tracking for scrolling or completed activities -->
+        <div class="w-full bg-slate-200 h-1">
+            <div id="page-progress" class="bg-brand-600 h-full w-[5%]" style="transition: width 0.3s ease;"></div>
         </div>
-    </nav>
+    </header>
+
+    <!-- Interactive Navigation Tabs -->
+    <div class="bg-white border-b border-slate-200 py-3 sticky top-[64px] sm:top-[80px] z-40 overflow-x-auto shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 flex space-x-2 sm:space-x-4 whitespace-nowrap scrollbar-none">
+            <button onclick="scrollToSection('pre-class')" class="tab-btn px-4 py-2 bg-brand-50 text-brand-700 font-bold text-sm rounded-full border border-brand-200 transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-bell"></i> <span>課前導入</span>
+            </button>
+            <button onclick="scrollToSection('knowledge-cards')" class="tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-layer-group"></i> <span>重點速記</span>
+            </button>
+            <button onclick="scrollToSection('calculators')" class="tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-compass-drafting"></i> <span>實操沙盒</span>
+            </button>
+            <button onclick="scrollToSection('matching-activity')" class="tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-gamepad"></i> <span>公式鞏固配對</span>
+            </button>
+            <button onclick="scrollToSection('mc-challenge')" class="tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-circle-question"></i> <span>DSE 模擬挑戰</span>
+            </button>
+            <button onclick="scrollToSection('reflection')" class="tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5">
+                <i class="fa-solid fa-clipboard-question"></i> <span>自主反思與導出</span>
+            </button>
+        </div>
+    </div>
 
     <!-- Main Container -->
-    <main class="max-w-5xl mx-auto px-4 pt-24 pb-20">
-        
-        <!-- Section 0: 課前導入 (Introduction) -->
-        <section id="sec-0" class="section-container flex flex-col items-center justify-center min-h-[75vh] text-center fade-in">
-            <div class="w-32 h-32 mb-6 bg-blue-100 rounded-full p-4 shadow-lg flex items-center justify-center">
-                <i class="fa-solid fa-earth-asia text-6xl text-thm_blue"></i>
-            </div>
-            <h1 class="text-4xl md:text-5xl font-black text-thm_dark mb-6 tracking-wide">誰才是真正的「旅客」？</h1>
-            
-            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-md border border-slate-200 max-w-2xl text-left mb-8">
-                <h3 class="text-xl font-bold text-thm_blue mb-4"><i class="fa-solid fa-book-open"></i> 課前小故事</h3>
-                <p class="text-slate-700 leading-relaxed mb-4">
-                    阿明一家人最近都在「移動」：<br>
-                    👨 <strong>爸爸：</strong>每天從上水搭火車到金鐘辦公室上班。<br>
-                    👦 <strong>阿明：</strong>星期六跟同學搭船到澳門吃葡撻，晚上即日回港。<br>
-                    👩 <strong>媽媽：</strong>飛去日本東京血拼探朋友，在當地住四晚溫泉旅館。<br>
-                    🧳 <strong>大伯：</strong>從加拿大搭飛機回香港探親，留港居住了兩個月。
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- Banner / Hero Welcome Section -->
+        <section class="relative bg-gradient-to-r from-brand-900 via-brand-800 to-slate-900 rounded-3xl p-8 sm:p-12 text-white shadow-2xl overflow-hidden">
+            <!-- Decorative Background Patterns -->
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-brand-200 text-[18rem] font-bold select-none pointer-events-none">DSE</div>
+            <div class="absolute right-1/4 top-10 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl"></div>
+            <div class="absolute left-1/3 bottom-5 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl"></div>
+
+            <div class="relative z-10 max-w-3xl space-y-6">
+                <span class="inline-flex items-center px-3 py-1 bg-brand-500/30 border border-brand-400/30 rounded-full text-xs sm:text-sm font-semibold text-brand-200">
+                    <i class="fa-solid fa-graduation-cap mr-1.5"></i> 中六 DSE 備考特訓專頁
+                </span>
+                <h2 class="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
+                    旅款計算無難度！<br><span class="bg-gradient-to-r from-cyan-400 to-emerald-400 bg-clip-text text-transparent">用直覺與工具秒殺考題</span>
+                </h2>
+                <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+                    同學，在旅遊與款待（THS）及地理科的名勝單元中，「計算題」一直都是得分關鍵。只要掌握好基本客房指標、餐廳定價公式與時區換算，不管是選擇題 (MC) 還是結構題 (DBQ)，分數都能穩穩拿下！
                 </p>
-                <div class="bg-orange-50 border-l-4 border-thm_orange p-4 rounded">
-                    <p class="font-bold text-thm_orange mb-1">思考問題：</p>
-                    <p class="text-sm">他們都在進行空間移動，但根據<strong>聯合國世界旅遊組織 (UNWTO)</strong> 的國際定義，他們全都是「旅客」嗎？他們之間有什麼本質上的差別？</p>
+                <div class="flex flex-wrap gap-4 pt-4">
+                    <a href="#pre-class" class="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl shadow-lg shadow-brand-500/30 transition-all flex items-center space-x-2">
+                        <span>開始速成特訓</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                    <button onclick="readAloudText('歡迎來到旅款之計算真簡單特訓。本網頁為您量身打造，包含客房銷售指標、餐單價格釐定以及世界時區計算三大核心考點。透過核心卡片、動態模擬計算器、公式配對與DSE模擬練習，幫助您高效備考，奪取5星星佳績！')" class="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold rounded-xl transition-all flex items-center space-x-2">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>聽取簡介</span>
+                    </button>
                 </div>
             </div>
-
-            <button onclick="navTo(1)" class="bg-thm_blue hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition transform hover:-translate-y-1 text-lg flex items-center gap-2">
-                開始探索 <i class="fa-solid fa-plane-departure"></i>
-            </button>
         </section>
 
-        <!-- Section 1: 重點教學 - 基本概念 -->
-        <section id="sec-1" class="section-container hide fade-in">
-            <h2 class="text-3xl font-black mb-6 text-thm_dark border-l-6 border-thm_blue pl-4">1. 旅客定義與分類基礎</h2>
-            <p class="text-slate-600 mb-8 text-lg">要準確統計旅遊業數據，必須釐清「訪客」、「過夜旅客」與「短程旅客」的界限。點擊卡片翻轉看詳細定義！</p>
-
-            <div class="grid md:grid-cols-3 gap-6 mb-10">
-                <!-- Card 1 -->
-                <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <i class="fa-solid fa-users text-5xl text-blue-500 mb-4"></i>
-                            <h4 class="font-bold text-2xl">訪客 (Visitor)</h4>
-                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
-                        </div>
-                        <div class="flip-card-back bg-blue-600">
-                            <h4 class="font-bold text-xl mb-3">訪客 (Visitor)</h4>
-                            <p class="text-sm px-2">離開日常環境（原居地），前往另一目的地（逗留少於一年），其主要旅行目的並非在當地從事受薪工作的人。<br><br><strong>(這是一個最廣義的統稱)</strong></p>
-                        </div>
-                    </div>
+        <!-- SECTION 1: 課前導入 Pre-class Intro -->
+        <section id="pre-class" class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-100">
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-lg font-bold">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
-                <!-- Card 2 -->
-                <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <i class="fa-solid fa-bed text-5xl text-green-500 mb-4"></i>
-                            <h4 class="font-bold text-2xl">過夜旅客</h4>
-                            <h5 class="text-lg text-slate-500">(Tourist / Overnight)</h5>
-                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
-                        </div>
-                        <div class="flip-card-back bg-green-600">
-                            <h4 class="font-bold text-xl mb-3">過夜旅客 (Tourist)</h4>
-                            <p class="text-sm px-2">在旅遊目的地逗留 <strong>24 小時或以上</strong>，並且在當地的集體或私人住宿設施（如酒店、青年旅舍、親友家）<strong>最少過夜一次</strong>的訪客。</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <i class="fa-solid fa-clock text-5xl text-orange-500 mb-4"></i>
-                            <h4 class="font-bold text-2xl">短程 / 不過夜旅客</h4>
-                            <h5 class="text-lg text-slate-500">(Excursionist / Same-day)</h5>
-                            <p class="text-sm text-slate-400 mt-2"><i class="fa-solid fa-rotate"></i> 點擊翻轉</p>
-                        </div>
-                        <div class="flip-card-back bg-orange-500">
-                            <h4 class="font-bold text-xl mb-3">短程旅客 (Excursionist)</h4>
-                            <p class="text-sm px-2">在目的地逗留 <strong>少於 24 小時</strong>，並且<strong>沒有</strong>在當地住宿設施過夜的訪客。<br>(例如：即日往返的購物客、郵輪靠岸觀光的過境乘客)</p>
-                        </div>
-                    </div>
-                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900">課前必看：DSE 命題趨勢分析</h3>
             </div>
-
-            <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 flex gap-4 items-start">
-                <i class="fa-solid fa-circle-question text-3xl text-thm_blue mt-1"></i>
-                <div>
-                    <h4 class="font-bold text-lg mb-1">對照故事答案：</h4>
-                    <p class="text-slate-700">
-                        爸爸是日常通勤（不屬訪客）；阿明是<strong>短程旅客 (Excursionist)</strong>；媽媽和大伯則屬於<strong>過夜旅客 (Tourist)</strong>！
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="p-4 bg-slate-50 border-l-4 border-amber-500 rounded-r-xl">
+                        <p class="text-slate-700 leading-relaxed font-semibold">
+                            「許多同學一看到數學計算就想要放棄。但是，旅款科的計算公式其實全部都是『小學程度』的乘除法！」
+                        </p>
+                    </div>
+                    <ul class="space-y-3 text-slate-600 text-sm sm:text-base">
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-1 mr-2 text-xs"></i>
+                            <span><strong>出題位置：</strong>多在卷一選擇題 (MC) 出現 (每年約 2-4 題)；有時也會在卷二的結構題 (DBQ) 以表格填空或分析的形式登場，佔分約 2-6 分。</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-1 mr-2 text-xs"></i>
+                            <span><strong>考題特徵：</strong>不考複雜數學，只考<strong>觀念混淆度</strong>。例如混淆 RevPAR (可供出租客房收入) 與 ADR (平均房價) 的分母，或者餐單定價中忘記把人工成本計入主要成本法中。</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-1 mr-2 text-xs"></i>
+                            <span><strong>致勝核心：</strong>掌握計算邏輯。當你能明白數字背後的商業意義，根本不需死記硬背。</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Interactive DSE Stat Preview Card -->
+                <div class="lg:col-span-5 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-6 shadow-lg border border-slate-700 relative">
+                    <span class="absolute top-3 right-3 text-2xs bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-full px-2 py-0.5 font-mono">DSE 統計數據</span>
+                    <h4 class="text-slate-200 text-xs font-bold uppercase tracking-wider mb-4">計算題歷年得分率預估</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>客房銷售指標 (RevPAR) 答對率</span>
+                                <span class="text-amber-400 font-mono font-bold">~ 55%</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-amber-400 h-2 rounded-full" style="width: 55%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>釐定餐單價格 (Prime Cost Method) 答對率</span>
+                                <span class="text-rose-400 font-mono font-bold">~ 48%</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-rose-400 h-2 rounded-full" style="width: 48%"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span>世界時區 (特別是跨越國際日期線) 答對率</span>
+                                <span class="text-red-400 font-mono font-bold">~ 42%</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 42%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-4 leading-relaxed italic">
+                        *數據顯示：時區與主要成本定價是同學最容易失分的部分。本特訓特設對應的動態沙盒計算機，請多加練習！
                     </p>
                 </div>
             </div>
-
-            <div class="mt-10 flex justify-between">
-                <button onclick="navTo(0)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
-                <button onclick="navTo(2)" class="btn-primary">下一步：旅遊流向 <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
         </section>
 
-        <!-- Section 2: 重點教學 - 旅遊流向 -->
-        <section id="sec-2" class="section-container hide fade-in">
-            <h2 class="text-3xl font-black mb-6 text-thm_dark border-l-6 border-thm_green pl-4">2. 根據流向分類</h2>
-            <p class="text-slate-600 mb-8 text-lg">旅客流向分為入境、出境和國內。這對評估一個地區的旅遊經濟平衡（收支）至關重要。</p>
-            
-            <div class="relative max-w-3xl mx-auto my-12">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
-                    
-                    <!-- Outbound -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_blue w-full text-center">
-                        <i class="fa-solid fa-plane-departure text-4xl text-thm_blue mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2">出境旅遊<br><span class="text-sm text-slate-500">Outbound Tourism</span></h3>
-                        <p class="text-sm text-slate-600">本國居民跨越邊境前往其他國家或地區。</p>
-                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
-                            <strong>香港視角：</strong>香港居民出發去日本東京。
-                        </div>
+        <!-- SECTION 2: 重點教學 Core Knowledge Cards (Revision notes) -->
+        <section id="knowledge-cards" class="space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600/10 text-brand-600 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-graduation-cap"></i>
                     </div>
-
-                    <!-- Domestic -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_orange w-full text-center transform md:-translate-y-6">
-                        <i class="fa-solid fa-map-location-dot text-4xl text-thm_orange mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2">國內旅遊<br><span class="text-sm text-slate-500">Domestic Tourism</span></h3>
-                        <p class="text-sm text-slate-600">本國居民在本國境內旅遊，不跨越國境。</p>
-                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
-                            <strong>香港視角：</strong>市區居民去長洲或大澳度假。
-                        </div>
-                    </div>
-
-                    <!-- Inbound -->
-                    <div class="bg-white p-6 rounded-xl shadow-lg border-t-4 border-thm_green w-full text-center">
-                        <i class="fa-solid fa-plane-arrival text-4xl text-thm_green mb-3"></i>
-                        <h3 class="font-bold text-xl mb-2">入境旅遊<br><span class="text-sm text-slate-500">Inbound Tourism</span></h3>
-                        <p class="text-sm text-slate-600">非本國居民跨越邊境進入本國或目的地地區。</p>
-                        <div class="mt-3 text-xs bg-slate-50 p-2 rounded text-left text-slate-500 border">
-                            <strong>香港視角：</strong>英國遊客抵達香港國際機場。
-                        </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">核心知識點速記手冊</h3>
+                        <p class="text-slate-500 text-sm">卡片形式整理教材重點，並支持英文/中文發音</p>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-10 flex justify-between">
-                <button onclick="navTo(1)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
-                <button onclick="navTo(3)" class="btn-primary">下一步：語音詞彙庫 <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-        </section>
-
-        <!-- Section 3: 語音詞彙庫 (Vocab & TTS) -->
-        <section id="sec-3" class="section-container hide fade-in">
-            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-purple-500 pl-4">3. 專業詞彙發音庫 (Vocabulary List)</h2>
-            <p class="text-slate-600 mb-6 text-lg">學好英語專業名詞是旅遊科的關鍵！點擊喇叭即可聆聽純正發音，並提供自主跟讀段落。</p>
-
-            <!-- TTS Controls for reading aloud -->
-            <div class="bg-purple-50 p-5 rounded-xl border border-purple-100 mb-8">
-                <h3 class="font-bold text-lg mb-2 text-purple-800 flex items-center gap-2">
-                    <i class="fa-solid fa-book-open-reader"></i> 段落跟讀挑戰 (Reading Aloud)
-                </h3>
-                <p class="text-slate-700 mb-4 leading-relaxed text-base" id="reading-text">
-                    According to the UNWTO, a <strong>visitor</strong> is a traveler taking a trip to a main destination outside his/her usual environment. Visitors are classified into <strong>tourists</strong> (overnight visitors) and <strong>excursionists</strong> (same-day visitors). Understanding the difference between <strong>inbound</strong> and <strong>outbound</strong> tourism is crucial for analyzing a country's tourism balance.
-                </p>
-                <div class="flex gap-3">
-                    <button onclick="playParagraph()" id="btn-para-play" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 shadow-sm transition"><i class="fa-solid fa-play"></i> 朗讀此段落</button>
-                    <button onclick="stopTTS()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition"><i class="fa-solid fa-stop"></i> 停止播放</button>
-                </div>
-            </div>
-
-            <!-- Vocab Grid (12 items) -->
-            <div class="grid md:grid-cols-2 gap-4" id="vocab-container">
-                <!-- Javascript will load 12 items here -->
-            </div>
-
-            <div class="mt-10 flex justify-between">
-                <button onclick="navTo(2)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
-                <button onclick="navTo(4)" class="btn-primary">下一步：配對挑戰 <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-        </section>
-
-        <!-- Section 4: 鞏固活動 (Matching) -->
-        <section id="sec-4" class="section-container hide fade-in">
-            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-pink-500 pl-4">4. 互動配對：旅客類型配對</h2>
-            <p class="text-slate-600 mb-6 text-lg">考驗你的邏輯分析！請先點選左方的「生活情境」，再點選右方對應的「旅客類型」進行連線。</p>
-            
-            <div class="bg-white p-6 rounded-2xl shadow-md border border-slate-200">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Left Column (Scenarios) -->
-                    <div class="flex flex-col gap-3" id="match-left">
-                        <!-- Loaded by JS -->
-                    </div>
-                    <!-- Right Column (Types) -->
-                    <div class="flex flex-col gap-3" id="match-right">
-                        <!-- Loaded by JS -->
-                    </div>
-                </div>
-                <div id="match-msg" class="mt-6 text-center font-bold text-xl min-h-[30px]"></div>
-            </div>
-
-            <div class="mt-10 flex justify-between">
-                <button onclick="navTo(3)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
-                <button onclick="navTo(5)" class="btn-primary">下一步：互動檢測 (5題) <i class="fa-solid fa-arrow-right"></i></button>
-            </div>
-        </section>
-
-        <!-- Section 5: 互動練習 (5 MCQs) -->
-        <section id="sec-5" class="section-container hide fade-in">
-            <h2 class="text-3xl font-black mb-2 text-thm_dark border-l-6 border-yellow-500 pl-4">5. 即時回饋檢測 (5 題多項選擇題)</h2>
-            <p class="text-slate-600 mb-6 text-lg">選擇正確答案後，系統會即時提供詳盡的解析回饋！</p>
-            
-            <div class="space-y-6" id="mcq-container">
-                <!-- MCQs generated dynamically -->
-            </div>
-
-            <div class="mt-10 flex justify-between">
-                <button onclick="navTo(4)" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> 上一步</button>
-                <button onclick="navTo(6)" class="bg-thm_green hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition transform hover:-translate-y-1">前往總結反思 <i class="fa-solid fa-flag-checkered"></i></button>
-            </div>
-        </section>
-
-        <!-- Section 6: 總結反思 -->
-        <section id="sec-6" class="section-container hide flex flex-col items-center min-h-[70vh] fade-in pt-10">
-            <div class="text-6xl mb-4 text-thm_orange"><i class="fa-solid fa-clipboard-question"></i></div>
-            <h2 class="text-4xl font-black text-thm_dark mb-4 text-center">單元完結與反思學習</h2>
-            <p class="text-lg text-slate-600 mb-8 max-w-2xl text-center">太棒了！你已成功完成了「旅客分類」的所有學術重點與互動練習。請完成以下兩個開放式反思問題：</p>
-            
-            <div class="w-full max-w-3xl space-y-6 text-left">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-thm_blue">
-                    <h3 class="font-bold text-lg mb-2 text-thm_dark">反思問題 (一)</h3>
-                    <p class="text-slate-600 mb-3">試回想你最近一次旅行（可以是離港或在本地郊遊）。根據本課所學的定義，你屬於哪一類旅客？這類型的旅客在目的地最常產生的消費行為是什麼？</p>
-                    <textarea id="reflect-1" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-thm_blue text-slate-700 resize-none" rows="3" placeholder="請將你的反思寫在這裡..."></textarea>
-                </div>
+            <!-- Theme Cards Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-l-4 border-l-thm_orange">
-                    <h3 class="font-bold text-lg mb-2 text-thm_dark">反思問題 (二)</h3>
-                    <p class="text-slate-600 mb-3">當大批「短程旅客 (Excursionist)」當天往返一個熱門旅遊景點（例如大嶼山大澳或尖沙咀），會對當地的「社區居民生活環境」與「經濟收益」帶來什麼好處與壞處？</p>
-                    <textarea id="reflect-2" class="w-full border border-slate-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-thm_orange text-slate-700 resize-none" rows="4" placeholder="請寫出你的利弊分析與看法..."></textarea>
+                <!-- CARD 1: 客房指標 -->
+                <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col overflow-hidden">
+                    <div class="p-6 bg-gradient-to-br from-brand-600 to-indigo-600 text-white relative">
+                        <div class="absolute right-4 top-4 text-white/10 text-6xl font-bold font-mono">01</div>
+                        <span class="text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full uppercase tracking-wider">房務部指標</span>
+                        <h4 class="text-xl font-bold mt-2 flex items-center space-x-1.5">
+                            <span>客房銷售收入與指標</span>
+                        </h4>
+                        <button onclick="readAloudText('主題一：客房銷售指標。核心概念有三個：第一，入住率 Occupancy Rate，計算方法是已售出客房數目除以可供出租客房總數，再乘以百分之百。第二，平均房價 Average Daily Rate 簡稱 ADR，計算方法是客房總收入除以已售出客房數目。第三，每間可供出租客房收入 Revenue Per Available Room 簡稱 RevPAR，計算方法是客房總收入除以可供出租客房總數，或者是入住率乘以平均房價。注意，RevPAR的分母是所有房間數，ADR的分母只有賣出去的房間數，這個常考！')" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors flex items-center justify-center" title="語音朗讀此卡片">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 flex-grow space-y-6">
+                        <!-- Key Formulas Group -->
+                        <div class="space-y-4">
+                            <div class="p-3 bg-brand-50 rounded-2xl border border-brand-100">
+                                <span class="text-xs font-bold text-brand-700 uppercase">入住率 (Occupancy Rate)</span>
+                                <p class="text-lg font-black text-slate-800 mt-1 font-mono text-center">
+                                    $\frac{\text{已售客房數}}{\text{可供出租客房總數}} \times 100\%$
+                                </p>
+                            </div>
+                            <div class="p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
+                                <span class="text-xs font-bold text-indigo-700 uppercase">平均房價 (ADR)</span>
+                                <p class="text-lg font-black text-slate-800 mt-1 font-mono text-center">
+                                    $\frac{\text{總客房收入}}{\text{已售客房數}}$
+                                </p>
+                            </div>
+                            <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <span class="text-xs font-bold text-emerald-700 uppercase">每間可供出租客房收入 (RevPAR)</span>
+                                <p class="text-lg font-black text-slate-800 mt-1 font-mono text-center">
+                                    $\frac{\text{總客房收入}}{\text{可供出租客房總數}}$
+                                </p>
+                                <p class="text-xs text-emerald-800 mt-2 text-center font-semibold">
+                                    或：$\text{入住率 (Occupancy Rate)} \times \text{ADR}$
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Key Tip Alert Box -->
+                        <div class="p-3.5 bg-rose-50 text-rose-800 rounded-xl text-xs leading-relaxed border border-rose-100 flex items-start space-x-2">
+                            <i class="fa-solid fa-lightbulb text-sm text-rose-500 mt-0.5"></i>
+                            <span>
+                                <strong>DSE陷阱提示：</strong>ADR 分母是<strong>「已售出 (Sold)」</strong>客房，而 RevPAR 分母是<strong>「可供出租 (Available)」</strong>客房總數。RevPAR 一定小於或等於 ADR！
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: 餐單定價 -->
+                <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col overflow-hidden">
+                    <div class="p-6 bg-gradient-to-br from-emerald-600 to-teal-600 text-white relative">
+                        <div class="absolute right-4 top-4 text-white/10 text-6xl font-bold font-mono">02</div>
+                        <span class="text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full uppercase tracking-wider">餐飲部指標</span>
+                        <h4 class="text-xl font-bold mt-2 flex items-center space-x-1.5">
+                            <span>釐定餐單價格基本方法</span>
+                        </h4>
+                        <button onclick="readAloudText('主題二：餐單價格釐定。通常考核兩種方法。第一：食物成本百分比法，公式是食物售價等於食物成本除以目標食物成本百分比。第二：主要成本法，售價等於主要成本除以目標主要成本百分比。注意！主要成本 Prime Cost 是指食物成本加上直接人工成本之和。千萬不要漏掉人工成本！')" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors flex items-center justify-center" title="語音朗讀此卡片">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 flex-grow space-y-6">
+                        <!-- Key Formulas Group -->
+                        <div class="space-y-4">
+                            <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                                <span class="text-xs font-bold text-emerald-700 uppercase">食物成本百分比法 (Food Cost %)</span>
+                                <p class="text-lg font-black text-slate-800 mt-1 font-mono text-center">
+                                    $\frac{\text{食物原材料成本}}{\text{目標食物成本百分比}}$
+                                </p>
+                            </div>
+                            <div class="p-3 bg-teal-50 rounded-2xl border border-teal-100">
+                                <span class="text-xs font-bold text-teal-700 uppercase">主要成本法 (Prime Cost Method)</span>
+                                <p class="text-lg font-black text-slate-800 mt-1 font-mono text-center">
+                                    $\frac{\text{食物成本} + \text{直接人工成本}}{\text{目標主要成本百分比}}$
+                                </p>
+                                <p class="text-2xs text-teal-800 mt-2 text-center font-semibold">
+                                    主要成本 (Prime Cost) = 原材料成本 + 直接人工成本
+                                </p>
+                            </div>
+                        </div>
+                        <!-- Key Tip Alert Box -->
+                        <div class="p-3.5 bg-rose-50 text-rose-800 rounded-xl text-xs leading-relaxed border border-rose-100 flex items-start space-x-2">
+                            <i class="fa-solid fa-lightbulb text-sm text-rose-500 mt-0.5"></i>
+                            <span>
+                                <strong>DSE陷阱提示：</strong>在主要成本法中，分子是<strong>「食物＋直接人工」</strong>之和，很多同學在做計算時會直接遺漏直接人工成本 (Direct Labor Cost) 的部分。
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 3: 世界時區 -->
+                <div class="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col overflow-hidden">
+                    <div class="p-6 bg-gradient-to-br from-sky-600 to-blue-600 text-white relative">
+                        <div class="absolute right-4 top-4 text-white/10 text-6xl font-bold font-mono">03</div>
+                        <span class="text-xs font-semibold bg-white/20 px-2.5 py-1 rounded-full uppercase tracking-wider">地理與交通</span>
+                        <h4 class="text-xl font-bold mt-2 flex items-center space-x-1.5">
+                            <span>時區計算與國際日期線</span>
+                        </h4>
+                        <button onclick="readAloudText('主題三：世界時區計算。要點有三。第一，地球每十五度經度為一個時區，代表一小時時差。本初子午線為零度 UTC。第二，時區口訣是東加西減。東經加時，西經減時。第三，國際日期變更線在一百八十度。當由西向東跨越時，例如從亞洲飛往美洲，日期要減一天；當由東向西跨越時，例如從美洲飛往亞洲，日期要加一天。計算飛機抵達時間，建議先把起飛當地的時間，加上飛行時間，再根據目的地時差進行加減，比較不容易出錯。')" class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-colors flex items-center justify-center" title="語音朗讀此卡片">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </div>
+                    <div class="p-6 flex-grow space-y-6">
+                        <!-- Key Formulas Group -->
+                        <div class="space-y-4">
+                            <div class="p-3 bg-sky-50 rounded-2xl border border-sky-100">
+                                <span class="text-xs font-bold text-sky-700 uppercase">基本換算規則</span>
+                                <ul class="text-xs text-slate-700 mt-1 space-y-1">
+                                    <li>• 地球 $360^\circ$ 分為 $24$ 個時區</li>
+                                    <li>• 每 <strong>$15^\circ$ 經度 = $1$ 小時時差</strong></li>
+                                    <li>• 本初子午線為基準 <strong>UTC / GMT 0</strong></li>
+                                </ul>
+                            </div>
+                            <div class="p-3 bg-blue-50 rounded-2xl border border-blue-100">
+                                <span class="text-xs font-bold text-blue-700 uppercase">國際日期變更線 (IDL $180^\circ$)</span>
+                                <div class="grid grid-cols-2 gap-2 mt-1 text-2xs text-slate-700 text-center">
+                                    <div class="p-1.5 bg-white rounded border border-blue-200">
+                                        <p class="font-bold text-rose-600">西 ─── 向 ───► 東</p>
+                                        <p class="mt-1">(亞洲飛往美洲)</p>
+                                        <p class="font-bold text-slate-900 mt-0.5">日期減 1 天 (-1 Day)</p>
+                                    </div>
+                                    <div class="p-1.5 bg-white rounded border border-blue-200">
+                                        <p class="font-bold text-emerald-600">東 ─── 向 ───► 西</p>
+                                        <p class="mt-1">(美洲飛往亞洲)</p>
+                                        <p class="font-bold text-slate-900 mt-0.5">日期加 1 天 (+1 Day)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Key Tip Alert Box -->
+                        <div class="p-3.5 bg-rose-50 text-rose-800 rounded-xl text-xs leading-relaxed border border-rose-100 flex items-start space-x-2">
+                            <i class="fa-solid fa-lightbulb text-sm text-rose-500 mt-0.5"></i>
+                            <span>
+                                <strong>時區黃金公式：</strong><br>
+                                $\text{目的地抵達時間 (當地)} = \text{起飛地出發時間 (當地)} + \text{飛行時間} \pm \text{時差}$
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SECTION 3: 實操沙盒 Core Interactive Calculators -->
+        <section id="calculators" class="bg-slate-900 text-white rounded-3xl p-6 sm:p-10 shadow-xl space-y-8 relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 opacity-5 text-white text-[12rem] font-bold select-none pointer-events-none">
+                <i class="fa-solid fa-cube"></i>
+            </div>
+            
+            <div class="relative z-10 max-w-4xl space-y-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-950 px-3 py-1 rounded-full border border-cyan-800">
+                    <i class="fa-solid fa-flask mr-1"></i> 互動練習室
+                </span>
+                <h3 class="text-2xl sm:text-3xl font-black">100% 擬真：三合一實務模擬計算沙盒</h3>
+                <p class="text-slate-400 text-sm sm:text-base leading-relaxed">
+                    在以下三個分頁中輸入你的自訂數值，系統將自動套用 DSE 公式，並列出**完整的推導步驟**。透過改變數值，深刻體會公式在現實商業中的意義！
+                </p>
+            </div>
+
+            <!-- Calculators Inner Tabs -->
+            <div class="border-b border-slate-800 flex space-x-2 overflow-x-auto pb-px">
+                <button onclick="switchCalcTab('hotel-calc')" id="btn-hotel-calc" class="calc-tab-btn px-4 py-2.5 border-b-2 border-cyan-400 text-cyan-400 font-bold text-sm transition-all whitespace-nowrap">
+                    客房銷售指標計算
+                </button>
+                <button onclick="switchCalcTab('menu-calc')" id="btn-menu-calc" class="calc-tab-btn px-4 py-2.5 border-b-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 font-bold text-sm transition-all whitespace-nowrap">
+                    餐單定價計算
+                </button>
+                <button onclick="switchCalcTab('timezone-calc')" id="btn-timezone-calc" class="calc-tab-btn px-4 py-2.5 border-b-2 border-transparent hover:border-slate-700 text-slate-400 hover:text-slate-200 font-bold text-sm transition-all whitespace-nowrap">
+                    世界時區與飛行模擬
+                </button>
+            </div>
+
+            <!-- TAB CONTENT 1: Hotel KPI Calculator -->
+            <div id="tab-hotel-calc" class="calc-panel space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">可供出租客房總數 (Total Rooms Available)</label>
+                        <input type="number" id="input-total-rooms" value="250" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">實際售出客房數 (Rooms Occupied)</label>
+                        <input type="number" id="input-sold-rooms" value="180" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">當日客房總收入 (Total Revenue, HKD)</label>
+                        <input type="number" id="input-room-revenue" value="135000" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                </div>
+
+                <!-- Run Button -->
+                <button onclick="calculateHotelKPIs()" class="w-full sm:w-auto px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>立即計算與生成步驟</span>
+                </button>
+
+                <!-- Output Steps Area -->
+                <div id="hotel-calc-output" class="bg-slate-950/80 rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <p class="text-xs text-slate-400 italic">點擊上方「立即計算」生成解析...</p>
                 </div>
             </div>
 
-            <!-- Download PDF Button / Save Option -->
-            <div class="mt-8 flex gap-4">
-                <button onclick="saveFeedback()" class="bg-thm_blue hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition shadow">儲存答案到本地</button>
+            <!-- TAB CONTENT 2: Menu Price Calculator -->
+            <div id="tab-menu-calc" class="calc-panel space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">食材原材料成本 (Food Raw Cost, HKD)</label>
+                        <input type="number" id="input-food-cost" value="45" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">直接人工成本 (Direct Labor Cost, HKD)</label>
+                        <input type="number" id="input-labor-cost" value="25" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">目標食物成本百分比 (%)</label>
+                        <input type="number" id="input-food-pct" value="30" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">目標主要成本百分比 (%)</label>
+                        <input type="number" id="input-prime-pct" value="45" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                </div>
+
+                <!-- Run Button -->
+                <button onclick="calculateMenuPricing()" class="w-full sm:w-auto px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-play"></i>
+                    <span>立即計算與生成步驟</span>
+                </button>
+
+                <!-- Output Steps Area -->
+                <div id="menu-calc-output" class="bg-slate-950/80 rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <p class="text-xs text-slate-400 italic">點擊上方「立即計算」生成解析...</p>
+                </div>
             </div>
 
-            <button onclick="navTo(0)" class="mt-10 text-thm_blue font-bold hover:underline flex items-center gap-2">
-                <i class="fa-solid fa-rotate-left"></i> 返回起點重新學習
-            </button>
+            <!-- TAB CONTENT 3: Time Zone Calculator -->
+            <div id="tab-timezone-calc" class="calc-panel space-y-6 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">起飛機場與時區 (Departure)</label>
+                        <select id="tz-dep" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="0" selected>倫敦 London (UTC+0)</option>
+                            <option value="8">香港/北京 Hong Kong/Beijing (UTC+8)</option>
+                            <option value="9">東京 Tokyo (UTC+9)</option>
+                            <option value="10">悉尼 Sydney (UTC+10)</option>
+                            <option value="-5">紐約 New York (UTC-5)</option>
+                            <option value="-8">洛杉磯 Los Angeles (UTC-8)</option>
+                            <option value="12">奧克蘭 Auckland (UTC+12)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">目的地機場與時區 (Destination)</label>
+                        <select id="tz-arr" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white outline-none focus:ring-2 focus:ring-cyan-500">
+                            <option value="0">倫敦 London (UTC+0)</option>
+                            <option value="8" selected>香港/北京 Hong Kong/Beijing (UTC+8)</option>
+                            <option value="9">東京 Tokyo (UTC+9)</option>
+                            <option value="10">悉尼 Sydney (UTC+10)</option>
+                            <option value="-5">紐約 New York (UTC-5)</option>
+                            <option value="-8">洛杉磯 Los Angeles (UTC-8)</option>
+                            <option value="12">奧克蘭 Auckland (UTC+12)</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">當地起飛日期與時間 (Departure Time)</label>
+                        <input type="datetime-local" id="tz-dep-time" value="2026-10-01T10:00" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-slate-300">飛行時數 (Flight Duration in Hours)</label>
+                        <input type="number" id="tz-duration" value="12" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-white font-mono outline-none focus:ring-2 focus:ring-cyan-500">
+                    </div>
+                </div>
+
+                <!-- Run Button -->
+                <button onclick="calculateFlightTime()" class="w-full sm:w-auto px-6 py-3 bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold rounded-xl transition-all shadow-md flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-plane-departure"></i>
+                    <span>起飛！模擬計算抵達時間</span>
+                </button>
+
+                <!-- Output Steps Area -->
+                <div id="timezone-calc-output" class="bg-slate-950/80 rounded-2xl p-6 border border-slate-800 space-y-4">
+                    <p class="text-xs text-slate-400 italic">點擊上方「起飛」進行飛行模擬器計算...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: 鞏固活動 Matching Activity -->
+        <section id="matching-activity" class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-100 space-y-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">核心公式與定義配對大挑戰</h3>
+                        <p class="text-slate-500 text-xs sm:text-sm">點擊左側的概念，再點擊右側對應的正確定義或公式以進行配對！</p>
+                    </div>
+                </div>
+                <!-- Reset Button -->
+                <button onclick="initMatchingGame()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-lg transition-colors">
+                    <i class="fa-solid fa-rotate-left mr-1"></i> 重設
+                </button>
+            </div>
+
+            <!-- Success Celebration Panel (Hidden by default) -->
+            <div id="matching-success" class="hidden p-6 bg-emerald-50 border border-emerald-200 rounded-2xl text-center space-y-3">
+                <div class="w-16 h-16 bg-emerald-500 text-white rounded-full flex items-center justify-center mx-auto text-3xl shadow-lg">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h4 class="text-xl font-black text-emerald-900">太棒了！您已成功完成所有配對！</h4>
+                <p class="text-emerald-700 text-sm max-w-lg mx-auto">
+                    這代表你已經對客房營運、餐飲價格釐定以及時區變更概念有了非常紮實的公式基礎。快點到下方進行 DSE 的全實戰模擬答題吧！
+                </p>
+            </div>
+
+            <!-- Game Board -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Column A: Concepts -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider">概念與項目 (Concept)</h4>
+                    <div id="col-concepts" class="space-y-2.5">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+
+                <!-- Column B: Formulas/Definitions -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold uppercase text-slate-400 tracking-wider">正確定義或計算公式 (Formula / Definition)</h4>
+                    <div id="col-formulas" class="space-y-2.5">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: 互動練習 Multiple Choice Challenge -->
+        <section id="mc-challenge" class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-slate-100 space-y-8">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-600/10 text-brand-600 flex items-center justify-center text-lg font-bold">
+                        <i class="fa-solid fa-medal"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl sm:text-2xl font-black text-slate-900">DSE 模擬挑戰：計算真簡單競技場</h3>
+                        <p class="text-slate-500 text-xs sm:text-sm">精心挑選 5 道極度貼合 DSE 題型的模擬題，提供最詳盡的算式詳解</p>
+                    </div>
+                </div>
+                <!-- Quiz Progress -->
+                <span id="quiz-badge" class="px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-full text-xs font-bold">
+                    得分率：0 / 5
+                </span>
+            </div>
+
+            <!-- Quiz Container -->
+            <div class="space-y-10" id="quiz-container">
+                <!-- Question Cards Will Be Rendered By JS -->
+            </div>
+
+            <!-- Quiz Summary Banner (Hidden until 5 questions are attempted) -->
+            <div id="quiz-summary" class="hidden p-6 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-white space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="text-lg font-black text-cyan-400">模擬競技場結算報告</h4>
+                        <p class="text-xs text-slate-400">恭喜你完成了所有挑戰！</p>
+                    </div>
+                    <span id="quiz-final-score" class="text-3xl font-black font-mono text-emerald-400">
+                        0%
+                    </span>
+                </div>
+                <div class="w-full bg-slate-700 rounded-full h-3">
+                    <div id="quiz-progress-bar" class="bg-gradient-to-r from-cyan-400 to-emerald-400 h-3 rounded-full" style="width: 0%"></div>
+                </div>
+                <p id="quiz-evaluation" class="text-sm text-slate-300 leading-relaxed">
+                    計算詳解已經解鎖在每一題的下方，請特別注意標註紅色錯誤的陷阱。建議收藏或記錄這些計算解題思維！
+                </p>
+            </div>
+        </section>
+
+        <!-- SECTION 6: 總結反思 Summary & Reflection Panel -->
+        <section id="reflection" class="bg-gradient-to-br from-brand-50 to-indigo-50 border border-brand-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-clipboard-question"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl sm:text-2xl font-black text-slate-900">總結反思與學習筆記導出</h3>
+                    <p class="text-slate-500 text-sm">請寫下你的學習心得，系統將整合前面的學習進度，為您生成一份專屬的 PDF / 文字複習報告</p>
+                </div>
+            </div>
+
+            <!-- Reflection inputs -->
+            <div class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-800 flex items-center justify-between">
+                        <span>Q1. 經過本次學習，你認為在計算客房銷售指標 (RevPAR) 時，最關鍵且最容易混淆的盲點是什麼？你將如何避免？</span>
+                        <button onclick="readAloudText('第一條反思問題：經過本次學習，你認為在計算客房銷售指標時，最關鍵且最容易混淆的盲點是什麼？你將如何避免？')" class="text-brand-600 hover:text-brand-700 text-xs flex items-center"><i class="fa-solid fa-volume-high mr-1"></i> 朗讀問題</button>
+                    </label>
+                    <textarea id="reflect-q1" rows="3" placeholder="例如：我常分不清楚 ADR 和 RevPAR 的分母差別。ADR 只能用已售客房作分母，而 RevPAR 則用可供出租房數..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-800 outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"></textarea>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-slate-800 flex items-center justify-between">
+                        <span>Q2. 面對 DSE 地理或旅款科最繁複的「跨越國際日期變更線時區計算」，你現在掌握的解題步驟是什麼？</span>
+                        <button onclick="readAloudText('第二條反思問題：面對地理或旅款科最繁複的跨越國際日期變更線時區計算，你現在掌握的解題步驟是什麼？')" class="text-brand-600 hover:text-brand-700 text-xs flex items-center"><i class="fa-solid fa-volume-high mr-1"></i> 朗讀問題</button>
+                    </label>
+                    <textarea id="reflect-q2" rows="3" placeholder="例如：我的解題公式是：起飛地時間 + 飛行時間，接著看目的地時差。若跨過日期變更線，從亞洲飛美洲日期減一天，美洲飛亞洲日期加一天..." class="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-slate-800 outline-none focus:ring-2 focus:ring-brand-500 shadow-sm"></textarea>
+                </div>
+
+                <!-- Export Action Card -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shadow-sm">
+                    <div>
+                        <h4 class="font-bold text-slate-900 flex items-center space-x-1.5">
+                            <i class="fa-solid fa-file-export text-brand-600"></i>
+                            <span>生成我的專屬複習筆記</span>
+                        </h4>
+                        <p class="text-xs text-slate-500 mt-1">匯出包含你的反思、當前模擬賽分數、以及核心公式的整合式文字報告。</p>
+                    </div>
+                    <button onclick="exportStudyNotes()" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl transition-all shadow-md flex items-center space-x-2 w-full sm:w-auto justify-center">
+                        <i class="fa-solid fa-download"></i>
+                        <span>導出複習備忘錄 (.txt)</span>
+                    </button>
+                </div>
+            </div>
         </section>
 
     </main>
 
+    <!-- Global Toast / Modal Container for Feedback instead of Alert() -->
+    <div id="custom-toast" class="fixed bottom-6 right-6 z-[100] transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3 border border-slate-700 max-w-sm">
+            <span id="toast-icon" class="text-xl text-emerald-400"><i class="fa-solid fa-circle-check"></i></span>
+            <span id="toast-message" class="text-xs sm:text-sm font-semibold"></span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-10 mt-20 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+            <p class="text-sm font-semibold tracking-wide text-brand-400">
+                DSE 旅款之計算真簡單 互動微學習系統
+            </p>
+            <p class="text-2xs text-slate-500 leading-relaxed">
+                本系統專為中六 DSE 旅遊與款待科及地理名勝單元學生設計。<br>
+                所有核心公式均符合最新 HKDSE 考評局課程大綱。請妥善利用語音朗讀、模擬計算沙盒與模擬競賽提高備考分數！
+            </p>
+            <p class="text-[10px] text-slate-600">
+                © 2026 專業教育科技教材開發小組. All Rights Reserved.
+            </p>
+        </div>
+    </footer>
+
+    <!-- MATHJAX for Formula Rendering -->
     <script>
-        // --- Shared Tailwind Button Classes Dynamic Append ---
-        const btnStyle = document.createElement('style');
-        btnStyle.innerHTML = `
-            .btn-primary { background-color: #2563eb; color: white; font-weight: bold; padding: 0.75rem 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-            .btn-primary:hover { background-color: #1d4ed8; transform: translateY(-2px); }
-            .btn-secondary { color: #64748b; font-weight: bold; padding: 0.75rem 1.5rem; transition: color 0.2s; display: inline-flex; align-items: center; gap: 0.5rem; }
-            .btn-secondary:hover { color: #2563eb; }
-        `;
-        document.head.appendChild(btnStyle);
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
-        // --- Navigation Logic ---
-        const totalSections = 6;
-        
-        function navTo(step) {
-            document.querySelectorAll('.section-container').forEach(sec => sec.classList.add('hide'));
-            document.getElementById(`sec-${step}`).classList.remove('hide');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Update Progress Bar
-            const progress = (step / totalSections) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            
-            const titles = ["準備出發", "概念基礎", "旅遊流向", "詞彙寶庫", "配對挑戰", "MC測驗", "總結反思"];
-            document.getElementById('progress-text').innerText = step === 0 ? titles[0] : `${titles[step]} (${Math.round(progress)}%)`;
+    <!-- Dynamic JavaScript Logic -->
+    <script>
+        // Global variables for tracking game states
+        let scores = {
+            hotelCalc: false,
+            menuCalc: false,
+            timezoneCalc: false,
+            matchingGame: 0,
+            mcQuestions: {}
+        };
 
-            stopTTS(); // Automatic stop audio when navigating
-        }
-
-        // --- 12 Key Vocabulary Items Data ---
-        const vocabList = [
-            { en: "Visitor", pos: "n.", zh: "訪客", enDef: "Any person traveling to a place outside his/her usual environment.", zhDef: "離開日常環境，前往另一地方不超過一年的訪客（最廣泛統稱）。", tip: "Vi-si-tor" },
-            { en: "Tourist", pos: "n.", zh: "過夜旅客", enDef: "A visitor who stays at least one night in the destination.", zhDef: "在目的地停留最少一晚（24小時或以上）的過夜旅客。", tip: "Too-rist" },
-            { en: "Excursionist", pos: "n.", zh: "短程旅客 / 不過夜旅客", enDef: "A same-day visitor who does not spend the night in the destination.", zhDef: "在目的地停留少於24小時，且不過夜的旅客。", tip: "Ex-cur-sion-ist" },
-            { en: "Inbound Tourism", pos: "n.", zh: "入境旅遊", enDef: "Non-residents traveling in the given country.", zhDef: "非原居地居民（外地遊客）進入本國旅遊。", tip: "In-bound" },
-            { en: "Outbound Tourism", pos: "n.", zh: "出境旅遊", enDef: "Residents of a country traveling to another country.", zhDef: "本國居民離開本國前往其他國家或地區旅遊。", tip: "Out-bound" },
-            { en: "Domestic Tourism", pos: "n.", zh: "國內旅遊", enDef: "Residents of a given country traveling within that country.", zhDef: "本國或地區居民在自己國家/地區範圍內旅遊。", tip: "Do-mes-tic" },
-            { en: "Leisure Tourism", pos: "n.", zh: "消閒旅遊", enDef: "Traveling for pleasure, relaxation, holidays, or recreation.", zhDef: "以度假、娛樂、休閒放鬆為主要目的的旅遊活動。", tip: "Lei-sure" },
-            { en: "Business Tourism", pos: "n.", zh: "商務旅遊", enDef: "Travel for commercial or professional purposes.", zhDef: "因公幹、出席商務會議或展覽而進行的旅遊活動。", tip: "Busi-ness" },
-            { en: "VFR", pos: "phr.", zh: "探訪親友", enDef: "Visiting Friends and Relatives.", zhDef: "以探望居住在外地的親戚或朋友為主要動機的旅行。", tip: "V-F-R" },
-            { en: "Destination", pos: "n.", zh: "旅遊目的地", enDef: "The final place to which a traveler is going.", zhDef: "旅客旅程的終點站，即吸引旅客前往觀光的地區。", tip: "Des-ti-na-tion" },
-            { en: "Usual Environment", pos: "n.", zh: "日常環境 / 原居地", enDef: "The geographical area where a person lives and works regularly.", zhDef: "個人生活、工作、上學的固定地理範圍。", tip: "U-sual En-vi-ron-ment" },
-            { en: "Length of Stay", pos: "n.", zh: "逗留時間", enDef: "The total number of days or nights spent at a destination.", zhDef: "旅客在目的地停留的時間總和，是觀光數據重要指標。", tip: "Length of stay" }
-        ];
-
-        // Dynamic render vocab cards
-        const vocabContainer = document.getElementById('vocab-container');
-        vocabList.forEach((v, index) => {
-            vocabContainer.innerHTML += `
-                <div class="vocab-item bg-white p-4 rounded-xl shadow-sm border border-slate-200 border-l-4 border-l-slate-300 relative group">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h4 class="text-lg font-bold text-thm_dark flex items-center gap-2">
-                                ${v.en} <span class="text-xs font-normal text-slate-400 italic">${v.pos}</span>
-                            </h4>
-                            <div class="text-sm text-thm_blue font-bold mt-1">${v.zh}</div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="playWord('${v.en}', 'en-US', 'v-en-${index}')" id="v-en-${index}" class="w-8 h-8 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition" title="English Pronunciation"><i class="fa-solid fa-volume-high"></i></button>
-                            <button onclick="playWord('${v.zh}', 'zh-HK', 'v-zh-${index}')" id="v-zh-${index}" class="w-8 h-8 rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 flex items-center justify-center transition" title="廣東話朗讀"><i class="fa-solid fa-volume-high"></i></button>
-                        </div>
-                    </div>
-                    <div class="text-[11px] text-slate-500 mb-2 bg-slate-50 px-2 py-0.5 rounded inline-block"><i class="fa-solid fa-comment-dots text-slate-400"></i> 發音拼讀: ${v.tip}</div>
-                    <p class="text-xs text-slate-600 mb-1 leading-snug"><strong>英文解說:</strong> ${v.enDef}</p>
-                    <p class="text-xs text-slate-600 leading-snug"><strong>中文解說:</strong> ${v.zhDef}</p>
-                </div>
-            `;
-        });
-
-        // --- Web Speech API (TTS) Core JavaScript Logic ---
+        // Speech System Variables
         let synth = window.speechSynthesis;
-        let playingIconId = null;
+        let currentUtterance = null;
 
-        function playWord(text, lang, btnId) {
-            stopTTS();
-            if (synth.speaking) return;
-
-            const utterThis = new SpeechSynthesisUtterance(text);
-            utterThis.rate = 0.85; // Natural learning speed
+        // Custom Toast system
+        function showToast(message, isSuccess = true, iconClass = "") {
+            const toast = document.getElementById('custom-toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
             
-            setVoiceAndLang(utterThis, lang);
-
-            utterThis.onstart = () => {
-                const btn = document.getElementById(btnId);
-                if(btn) { btn.innerHTML = '<i class="fa-solid fa-waveform fa-beat"></i>'; playingIconId = btnId; }
-            };
-            utterThis.onend = resetTTSBtns;
-            utterThis.onerror = resetTTSBtns;
-
-            synth.speak(utterThis);
-        }
-
-        function playParagraph() {
-            stopTTS();
-            const text = document.getElementById('reading-text').innerText;
-            const utterThis = new SpeechSynthesisUtterance(text);
-            utterThis.rate = 0.8; // Clearer articulation for paragraph
-            setVoiceAndLang(utterThis, 'en-US');
-
-            const btn = document.getElementById('btn-para-play');
-            utterThis.onstart = () => {
-                btn.innerHTML = '<i class="fa-solid fa-waveform fa-beat"></i> 朗讀中...';
-                playingIconId = 'btn-para-play';
-                btn.classList.add('bg-purple-800');
-            };
-            utterThis.onend = () => {
-                btn.innerHTML = '<i class="fa-solid fa-play"></i> 朗讀此段落';
-                btn.classList.remove('bg-purple-800');
-                playingIconId = null;
-            };
+            toastMsg.innerText = message;
             
-            synth.speak(utterThis);
-        }
-
-        function setVoiceAndLang(utterance, langPref) {
-            const voices = synth.getVoices();
-            let voice = null;
-            if (langPref === 'zh-HK') {
-                voice = voices.find(v => v.lang.includes('zh-HK')) || voices.find(v => v.lang.includes('zh-TW')) || voices.find(v => v.lang.includes('zh-CN'));
+            if (iconClass) {
+                toastIcon.innerHTML = `<i class="${iconClass}"></i>`;
             } else {
-                voice = voices.find(v => v.lang === 'en-US' || v.lang === 'en-GB') || voices.find(v => v.lang.includes('en'));
+                toastIcon.innerHTML = isSuccess ? 
+                    `<i class="fa-solid fa-circle-check text-emerald-400"></i>` : 
+                    `<i class="fa-solid fa-circle-exclamation text-rose-400"></i>`;
             }
-            if (voice) { utterance.voice = voice; }
-            utterance.lang = langPref;
-        }
-
-        function stopTTS() {
-            synth.cancel();
-            resetTTSBtns();
-        }
-
-        function resetTTSBtns() {
-            if (playingIconId) {
-                const btn = document.getElementById(playingIconId);
-                if (btn) {
-                    if (playingIconId === 'btn-para-play') {
-                        btn.innerHTML = '<i class="fa-solid fa-play"></i> 朗讀此段落';
-                        btn.classList.remove('bg-purple-800');
-                    } else {
-                        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-                    }
-                }
-                playingIconId = null;
-            }
-        }
-        
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = () => synth.getVoices();
-        }
-
-        // --- Data: Matching Game ---
-        const matchData = [
-            { id: "m1", scenario: "住在倫敦的約翰來香港迪士尼樂園遊玩三天", type: "入境過夜旅客" },
-            { id: "m2", scenario: "香港市民星期六去長洲郊遊，當天回市區", type: "國內短程旅客" },
-            { id: "m3", scenario: "香港中四學生去日本大阪進行五天修學旅行", type: "出境過夜旅客" },
-            { id: "m4", scenario: "深圳居民經羅湖來香港辦年貨，晚上回深圳", type: "入境短程旅客" }
-        ];
-
-        // Render matching columns
-        function initMatchGame() {
-            const leftCol = document.getElementById('match-left');
-            const rightCol = document.getElementById('match-right');
-            leftCol.innerHTML = ''; rightCol.innerHTML = '';
             
-            const shuffledScenarios = [...matchData].sort(() => Math.random() - 0.5);
-            const shuffledTypes = [...matchData].sort(() => Math.random() - 0.5);
-
-            shuffledScenarios.forEach(item => {
-                leftCol.innerHTML += `<button class="match-btn border-2 border-slate-300 rounded-lg p-4 text-left bg-slate-50 font-medium text-sm md:text-base" data-id="${item.id}">${item.scenario}</button>`;
-            });
-
-            shuffledTypes.forEach(item => {
-                rightCol.innerHTML += `<button class="match-btn border-2 border-slate-300 rounded-lg p-4 font-bold text-center bg-slate-50 text-thm_blue text-sm md:text-base" data-id="${item.id}">${item.type}</button>`;
-            });
-
-            attachMatchListeners();
+            // Show toast
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            // Auto hide
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3500);
         }
 
-        let selectedLeft = null;
-        let selectedRight = null;
-        let matchesCount = 0;
+        // Web Speech API Read Aloud
+        function readAloudText(text) {
+            if (!synth) {
+                showToast("您的瀏覽器不支持語音合成功能", false);
+                return;
+            }
+            
+            // Stop any ongoing speech
+            synth.cancel();
 
-        function attachMatchListeners() {
-            document.querySelectorAll('#match-left .match-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if(this.classList.contains('matched')) return;
-                    document.querySelectorAll('#match-left .match-btn').forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedLeft = this;
-                    checkMatch();
-                });
-            });
+            // Setup Indicator
+            const indicator = document.getElementById('tts-indicator');
+            const stopBtn = document.getElementById('btn-stop-all');
+            indicator.classList.remove('hidden');
+            indicator.classList.add('flex');
+            stopBtn.classList.remove('hidden');
+            stopBtn.classList.add('flex');
 
-            document.querySelectorAll('#match-right .match-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    if(this.classList.contains('matched')) return;
-                    document.querySelectorAll('#match-right .match-btn').forEach(b => b.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedRight = this;
-                    checkMatch();
-                });
-            });
+            // Select Voice based on Lang
+            const langSelect = document.getElementById('tts-lang').value;
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = langSelect;
+            
+            // Adjust rate & pitch
+            currentUtterance.rate = 1.0; 
+            currentUtterance.pitch = 1.0;
+
+            // Handle End event
+            currentUtterance.onend = function() {
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+                stopBtn.classList.add('hidden');
+                stopBtn.classList.remove('flex');
+            };
+
+            currentUtterance.onerror = function() {
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+                stopBtn.classList.add('hidden');
+                stopBtn.classList.remove('flex');
+            };
+
+            synth.speak(currentUtterance);
         }
 
-        function checkMatch() {
-            if (selectedLeft && selectedRight) {
-                const idLeft = selectedLeft.getAttribute('data-id');
-                const idRight = selectedRight.getAttribute('data-id');
-                const msgBox = document.getElementById('match-msg');
+        function stopSpeech() {
+            if (synth) {
+                synth.cancel();
+                const indicator = document.getElementById('tts-indicator');
+                const stopBtn = document.getElementById('btn-stop-all');
+                indicator.classList.add('hidden');
+                indicator.classList.remove('flex');
+                stopBtn.classList.add('hidden');
+                stopBtn.classList.remove('flex');
+                showToast("語音播放已停止", true, "fa-solid fa-circle-stop text-sky-400");
+            }
+        }
 
-                if (idLeft === idRight) {
-                    selectedLeft.className = "match-btn border-2 rounded-lg p-4 matched text-left text-sm md:text-base";
-                    selectedRight.className = "match-btn border-2 rounded-lg p-4 matched text-center text-sm md:text-base";
-                    selectedLeft = null; selectedRight = null;
-                    matchesCount++;
-                    msgBox.innerHTML = '<span class="text-thm_green fade-in"><i class="fa-solid fa-circle-check"></i> 配對正確！太棒了！</span>';
+        // Scroll helper
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+                // Update active button state
+                updateTabBtnHighlight(id);
+            }
+        }
 
-                    if (matchesCount === matchData.length) {
-                        msgBox.innerHTML = '<span class="text-thm_orange text-2xl font-bold fade-in"><i class="fa-solid fa-trophy"></i> 精彩！全部配對挑戰成功！</span>';
-                    }
+        function updateTabBtnHighlight(activeId) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                const clickAttr = btn.getAttribute('onclick');
+                if (clickAttr && clickAttr.includes(activeId)) {
+                    btn.className = "tab-btn px-4 py-2 bg-brand-50 text-brand-700 font-bold text-sm rounded-full border border-brand-200 transition-all flex items-center space-x-1.5 shadow-sm";
                 } else {
-                    selectedLeft.classList.add('error');
-                    selectedRight.classList.add('error');
-                    msgBox.innerHTML = '<span class="text-red-500 fade-in"><i class="fa-solid fa-circle-xmark"></i> 分類不符，請再思考一下關係！</span>';
-
-                    setTimeout(() => {
-                        if(selectedLeft) selectedLeft.classList.remove('error', 'selected');
-                        if(selectedRight) selectedRight.classList.remove('error', 'selected');
-                        selectedLeft = null; selectedRight = null;
-                        msgBox.innerHTML = '';
-                    }, 800);
+                    btn.className = "tab-btn px-4 py-2 hover:bg-slate-100 text-slate-600 font-medium text-sm rounded-full transition-all flex items-center space-x-1.5";
                 }
-            }
-        }
-        initMatchGame();
-
-
-        // --- Data: 5 MCQs ---
-        const mcqData = [
-            {
-                q: "根據聯合國世界旅遊組織 (UNWTO)，區分「過夜旅客」和「短程旅客」的關鍵標準是什麼？",
-                opts: ["A. 旅遊目的 (消閒或商務)", "B. 逗留時間是否超過 24 小時並過夜", "C. 是否跨越國界", "D. 所選乘的交通工具"],
-                ans: 1,
-                exp: "正確！逗留時間在 24 小時或以上並在當地有住宿過夜的人為 Tourist (過夜旅客)，而少於 24 小時且不過夜的為 Excursionist (短程旅客)。"
-            },
-            {
-                q: "廣州居民王先生到上海出差 3 天，期間入住當地的商務酒店。對中國（目的地國）而言，王先生屬於：",
-                opts: ["A. 入境短程旅客", "B. 出境過夜旅客", "C. 國內過夜旅客", "D. 國際商務旅客"],
-                ans: 2,
-                exp: "正確！廣州和上海都在同一個國家（中國）內，因此屬於國內旅遊；他在當地過夜留宿，因此屬於過夜旅客。"
-            },
-            {
-                q: "瑪麗從紐約飛往悉尼，在香港國際機場過境區停留了 4 小時等待轉機，期間未辦理入境。她是否被界定為香港訪客？",
-                opts: ["A. 算，她是過境的短程旅客", "B. 算，她是國際入境旅客", "C. 不算，未通過邊境管制站進入地區的轉機乘客在法律與統計上不列為該地訪客", "D. 算，她帶來了機場消費"],
-                ans: 2,
-                exp: "正確！未通過出入境邊防管制站進入當地經濟領域的純轉機/過境旅客，不被計入目的地的訪客（Visitor）統計中。"
-            },
-            {
-                q: "一艘豪華郵輪早上停靠香港啟德碼頭，美籍遊客約翰下船到旺角購物，當晚返回郵輪艙房睡覺，郵輪次日駛離。約翰對香港而言是：",
-                opts: ["A. 國內過夜旅客", "B. 入境短程旅客 (Excursionist)", "C. 入境過夜旅客 (Tourist)", "D. 出境短程旅客"],
-                ans: 1,
-                exp: "正確！約翰跨越邊境進入香港（入境），但他晚上回到了移動的郵輪（非陸地固定住宿設施）睡覺，且留港少於24小時，應界定為短程旅客。"
-            },
-            {
-                q: "以下哪一項出行活動的主要目的，符合聯合國世界旅遊組織界定之「旅遊」活動範疇？",
-                opts: ["A. 前往鄰近城市的大學就讀為期四年的全日制課程", "B. 前往跨國公司的倫敦總部，受聘並開始為期兩年的工作合約", "C. 前往首爾進行為期四天的醫學美容與微整形手術", "D. 逃避內戰衝突跨越邊界尋求庇護的難民"],
-                ans: 2,
-                exp: "正確！醫療、消閒、商務公幹、探訪親友都屬於旅遊定義的範疇。而長期求學（超一年）、受僱於目的地（受薪工作）或非自願的強制遷移（如難民）皆非旅遊定義。 "
-            }
-        ];
-
-        // MCQ Rendering Engine with Instant Interactive Feedback
-        const mcqContainer = document.getElementById('mcq-container');
-        mcqData.forEach((item, index) => {
-            let optsHtml = '';
-            item.opts.forEach((opt, optIdx) => {
-                const isCorrect = (optIdx === item.ans);
-                optsHtml += `<button onclick="handleMCQ(this, ${isCorrect}, 'exp-${index}')" class="w-full text-left p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition bg-white font-medium text-sm md:text-base mcq-btn-${index}">${opt}</button>`;
             });
+        }
 
-            mcqContainer.innerHTML += `
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <p class="font-bold text-lg text-thm_dark mb-4"><span class="text-thm_blue mr-2">Q${index + 1}.</span> ${item.q}</p>
-                    <div class="grid md:grid-cols-2 gap-3 mb-4">
-                        ${optsHtml}
-                    </div>
-                    <div id="exp-${index}" class="hidden p-4 rounded-lg text-sm font-medium fade-in"></div>
-                </div>
-            `;
+        // Scroll Spy for Scroll Indicator & Header progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('page-progress').style.width = scrolled + '%';
         });
 
-        function handleMCQ(btn, isCorrect, expId) {
-            const btnClass = Array.from(btn.classList).find(c => c.startsWith('mcq-btn-'));
-            const allBtns = document.querySelectorAll(`.${btnClass}`);
-            const expBox = document.getElementById(expId);
-            const qIndex = expId.split('-')[1];
-
-            // Lock and freeze options once clicked
-            allBtns.forEach(b => {
-                b.disabled = true;
-                b.classList.add('opacity-60', 'cursor-not-allowed');
-                b.classList.remove('hover:bg-slate-50');
+        // SECTION 3 logic: SANDBOX CALCULATORS
+        function switchCalcTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.calc-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            // Reset tab button highlight
+            document.querySelectorAll('.calc-tab-btn').forEach(btn => {
+                btn.className = "calc-tab-btn px-4 py-2.5 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-bold text-sm transition-all whitespace-nowrap";
             });
 
-            btn.classList.remove('opacity-60');
-            
-            if (isCorrect) {
-                btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-                expBox.className = "p-4 rounded-lg text-sm font-bold bg-green-50 text-green-700 fade-in flex gap-2 items-start mt-4";
-                expBox.innerHTML = `<i class="fa-solid fa-circle-check mt-1 text-lg"></i> <div>【答案正確】<br>${mcqData[qIndex].exp}</div>`;
-            } else {
-                btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
-                expBox.className = "p-4 rounded-lg text-sm font-bold bg-red-50 text-red-700 fade-in flex gap-2 items-start mt-4";
-                expBox.innerHTML = `<i class="fa-solid fa-circle-xmark mt-1 text-lg"></i> <div>【答案錯誤】正確答案應為：${mcqData[qIndex].opts[mcqData[qIndex].ans]}。<br><span class="text-xs font-normal mt-1 inline-block">${mcqData[qIndex].exp}</span></div>`;
-                
-                // Highlight correct answer in green outline
-                allBtns[mcqData[qIndex].ans].classList.remove('opacity-60');
-                allBtns[mcqData[qIndex].ans].classList.add('border-green-500', 'border-2', 'bg-green-50');
-            }
-            expBox.classList.remove('hidden');
+            // Show active
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).className = "calc-tab-btn px-4 py-2.5 border-b-2 border-cyan-400 text-cyan-400 font-bold text-sm transition-all whitespace-nowrap";
         }
 
-        // --- Save Reflective Answers locally inside standard browser ---
-        function saveFeedback() {
-            const r1 = document.getElementById('reflect-1').value;
-            const r2 = document.getElementById('reflect-2').value;
+        // 1. Hotel KPI calc logic
+        function calculateHotelKPIs() {
+            const total = parseInt(document.getElementById('input-total-rooms').value);
+            const sold = parseInt(document.getElementById('input-sold-rooms').value);
+            const revenue = parseFloat(document.getElementById('input-room-revenue').value);
+            const output = document.getElementById('hotel-calc-output');
 
-            if(!r1.trim() || !r2.trim()) {
-                alert("請填寫完反思問題的答案後再進行儲存！");
+            if (isNaN(total) || isNaN(sold) || isNaN(revenue) || total <= 0 || sold < 0) {
+                showToast("請輸入正確且大於 0 的房間數值！", false);
                 return;
             }
 
-            // In Apps Script environment, direct file saving is sandboxed, so we store it in LocalStorage for persistence.
-            localStorage.setItem('tourism_reflect_1', r1);
-            localStorage.setItem('tourism_reflect_2', r2);
+            if (sold > total) {
+                showToast("售出客房數不能大於可供出租客房總數！", false);
+                return;
+            }
+
+            // Calculations
+            const occRate = (sold / total) * 100;
+            const adr = sold > 0 ? (revenue / sold) : 0;
+            const revparDirect = revenue / total;
+            const revparAlternative = (occRate / 100) * adr;
+
+            // Generate Markdown/HTML content showing formulas step-by-step
+            output.innerHTML = `
+                <div class="space-y-4 text-slate-200">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-sm font-bold text-cyan-400">計算結果摘要</span>
+                        <span class="text-xs bg-cyan-950 text-cyan-400 px-2.5 py-0.5 rounded-full font-mono">DSE 房務篇</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <span class="text-2xs text-slate-400 block font-bold">入住率 (Occupancy Rate)</span>
+                            <span class="text-2xl font-black text-white font-mono">${occRate.toFixed(2)}%</span>
+                        </div>
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <span class="text-2xs text-slate-400 block font-bold">平均房價 (ADR)</span>
+                            <span class="text-2xl font-black text-white font-mono">HKD $${adr.toFixed(2)}</span>
+                        </div>
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <span class="text-2xs text-slate-400 block font-bold">每間可供出租客房收入 (RevPAR)</span>
+                            <span class="text-2xl font-black text-emerald-400 font-mono">HKD $${revparDirect.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 pt-2 text-xs">
+                        <p class="font-bold text-slate-300"><i class="fa-solid fa-code-compare mr-1.5 text-cyan-400"></i>推導步驟解析：</p>
+                        
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2 leading-relaxed">
+                            <p><strong>步驟 1. 計算入住率：</strong><br>
+                            公式：$$\\text{入住率} = \\frac{\\text{已售客房}}{\\text{可供出租客房}} \\times 100\\%$$
+                            帶入數值：$$\\frac{${sold}}{${total}} \\times 100\\% = \\mathbf{${occRate.toFixed(2)}\\%}$$</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2 leading-relaxed">
+                            <p><strong>步驟 2. 計算平均房價 (ADR)：</strong><br>
+                            公式：$$\\text{ADR} = \\frac{\\text{客房收入}}{\\text{已售客房}}$$
+                            帶入數值：$$\\frac{\\$${revenue.toLocaleString()}}{${sold}} = \\mathbf{\\$${adr.toFixed(2)}}$$</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2 leading-relaxed">
+                            <p><strong>步驟 3. 計算每間可供出租客房收入 (RevPAR)：</strong><br>
+                            <em>方法 A (直接收入法)：</em>$$\\text{RevPAR} = \\frac{\\text{客房總收入}}{\\text{可供出租客房總數}}$$
+                            帶入數值：$$\\frac{\\$${revenue.toLocaleString()}}{${total}} = \\mathbf{\\$${revparDirect.toFixed(2)}}$$<br>
+                            <em>方法 B (指標乘積法)：</em>$$\\text{RevPAR} = \\text{入住率} \\times \\text{ADR}$$
+                            帶入數值：$$\\mathbf{${occRate.toFixed(2)}\\% \\times \\$${adr.toFixed(2)} = \\$${revparAlternative.toFixed(2)}}$$</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Trigger MathJax render for dynamically added formulas
+            if (window.MathJax) {
+                MathJax.typesetPromise([output]);
+            }
+            showToast("房務指標計算完畢！");
+        }
+
+        // 2. Menu price calc logic
+        function calculateMenuPricing() {
+            const cost = parseFloat(document.getElementById('input-food-cost').value);
+            const labor = parseFloat(document.getElementById('input-labor-cost').value);
+            const foodPct = parseFloat(document.getElementById('input-food-pct').value);
+            const primePct = parseFloat(document.getElementById('input-prime-pct').value);
+            const output = document.getElementById('menu-calc-output');
+
+            if (isNaN(cost) || isNaN(labor) || isNaN(foodPct) || isNaN(primePct) || cost <= 0 || foodPct <= 0 || primePct <= 0) {
+                showToast("請確認所有輸入值均大於 0！", false);
+                return;
+            }
+
+            // Calculations
+            const foodCostPrice = cost / (foodPct / 100);
+            const primeCostSum = cost + labor;
+            const primeCostPrice = primeCostSum / (primePct / 100);
+
+            output.innerHTML = `
+                <div class="space-y-4 text-slate-200">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-sm font-bold text-emerald-400">計算結果摘要</span>
+                        <span class="text-xs bg-emerald-950 text-emerald-400 px-2.5 py-0.5 rounded-full font-mono">DSE 餐飲篇</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <span class="text-2xs text-slate-400 block font-bold">食物成本百分比法 定價</span>
+                            <span class="text-2xl font-black text-white font-mono">HKD $${foodCostPrice.toFixed(2)}</span>
+                        </div>
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800">
+                            <span class="text-2xs text-slate-400 block font-bold">主要成本法 (Prime Cost Method) 定價</span>
+                            <span class="text-2xl font-black text-emerald-400 font-mono">HKD $${primeCostPrice.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-3 pt-2 text-xs">
+                        <p class="font-bold text-slate-300"><i class="fa-solid fa-code-compare mr-1.5 text-emerald-400"></i>推導步驟解析：</p>
+                        
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2 leading-relaxed">
+                            <p><strong>方法 1. 食物成本百分比法：</strong><br>
+                            公式：$$\\text{售價} = \\frac{\\text{食材原材料成本}}{\\text{目標食物成本百分比}}$$
+                            帶入數值：$$\\frac{\\$${cost}}{${foodPct}\\%} = \\frac{\\$${cost}}{0.3} = \\mathbf{\\$${foodCostPrice.toFixed(2)}}$$</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2 leading-relaxed">
+                            <p><strong>方法 2. 主要成本法 (DSE最容易遺漏人工成本)：</strong><br>
+                            首先計算<strong>主要成本 (Prime Cost)</strong>：
+                            $$\\text{主要成本} = \\text{食材原材料成本} + \\text{直接人工成本} = \\$${cost} + \\$${labor} = \\mathbf{\\$${primeCostSum.toFixed(2)}}$$<br>
+                            
+                            接著計算主要成本法定價：
+                            $$\\text{售價} = \\frac{\\text{主要成本}}{\\text{目標主要成本百分比}}$$
+                            帶入數值：$$\\frac{\\$${primeCostSum.toFixed(2)}}{${primePct}\\%} = \\frac{\\$${primeCostSum.toFixed(2)}}{0.45} = \\mathbf{\\$${primeCostPrice.toFixed(2)}}$$</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.MathJax) {
+                MathJax.typesetPromise([output]);
+            }
+            showToast("餐單定價計算完畢！");
+        }
+
+        // 3. Time zone flight simulation logic
+        function calculateFlightTime() {
+            const depTz = parseInt(document.getElementById('tz-dep').value);
+            const arrTz = parseInt(document.getElementById('tz-arr').value);
+            const depTimeVal = document.getElementById('tz-dep-time').value;
+            const duration = parseFloat(document.getElementById('tz-duration').value);
+            const output = document.getElementById('timezone-calc-output');
+
+            if (!depTimeVal || isNaN(duration) || duration < 0) {
+                showToast("請填寫起飛日期時間以及大於 0 的飛行時數！", false);
+                return;
+            }
+
+            // Create dates using JS (handle with proper timezone offsets manually to avoid browser local interference)
+            // Parse: 2026-10-01T10:00 -> Date
+            const parsedTime = new Date(depTimeVal);
             
-            alert("您的思考答案已成功儲存在此瀏覽器中！即使重新整理網頁也依然存在。");
+            // Convert departure time to absolute UTC milliseconds based on Departure Zone Offset
+            // For example, if departure zone is +8, we subtract 8 hours from Local Time to get UTC.
+            const utcTimeMs = parsedTime.getTime() - (depTz * 60 * 60 * 1000);
+            const departureUTC = new Date(utcTimeMs);
+
+            // Add Flight Duration
+            const arrivalUTCMs = utcTimeMs + (duration * 60 * 60 * 1000);
+            const arrivalUTC = new Date(arrivalUTCMs);
+
+            // Convert to Destination Local Time
+            const arrivalLocalMs = arrivalUTCMs + (arrTz * 60 * 60 * 1000);
+            const arrivalLocal = new Date(arrivalLocalMs);
+
+            // Time difference calculation
+            const rawDiff = arrTz - depTz;
+            const formattedDiffSign = rawDiff >= 0 ? `+${rawDiff}` : `${rawDiff}`;
+
+            // Cross Date Line Check
+            let idlCrossMessage = "無跨越國際日期變更線。";
+            if ((depTz > 0 && arrTz < 0) && (Math.abs(depTz) + Math.abs(arrTz) > 12)) {
+                idlCrossMessage = "向東飛越太平洋（由東經飛往西經，跨越 180° 線），當地時間可能變為「昨天」，必須注意『扣減一日』的時間調整。";
+            } else if ((depTz < 0 && arrTz > 0) && (Math.abs(depTz) + Math.abs(arrTz) > 12)) {
+                idlCrossMessage = "向西飛越太平洋（由西經飛往東經，跨越 180° 線），當地時間可能跨過「明天」，必須注意『增加一日』的時間調整。";
+            }
+
+            // Format Options
+            const formatOpt = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            const depLocalString = parsedTime.toLocaleDateString('zh-HK', formatOpt);
+            const arrLocalString = arrivalLocal.toLocaleDateString('zh-HK', formatOpt);
+
+            output.innerHTML = `
+                <div class="space-y-4 text-slate-200">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-sm font-bold text-sky-400">時區飛行模擬報告</span>
+                        <span class="text-xs bg-sky-950 text-sky-400 px-2.5 py-0.5 rounded-full font-mono">DSE 名勝篇</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 border-l-4 border-l-cyan-400">
+                            <span class="text-2xs text-slate-400 block font-bold uppercase"><i class="fa-solid fa-plane-departure mr-1"></i>起飛時間 (當地)</span>
+                            <span class="text-base sm:text-lg font-black text-white font-mono">${depLocalString}</span>
+                            <span class="text-xs text-slate-400 block mt-1">出發地時區：UTC ${depTz >= 0 ? '+' + depTz : depTz}</span>
+                        </div>
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 border-l-4 border-l-emerald-400">
+                            <span class="text-2xs text-slate-400 block font-bold uppercase"><i class="fa-solid fa-plane-arrival mr-1"></i>抵達時間 (當地)</span>
+                            <span class="text-base sm:text-lg font-black text-emerald-400 font-mono">${arrLocalString}</span>
+                            <span class="text-xs text-slate-400 block mt-1">目的地時區：UTC ${arrTz >= 0 ? '+' + arrTz : arrTz}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-blue-950/40 border border-blue-900 text-slate-300 rounded-xl text-xs space-y-1.5 leading-relaxed">
+                        <p class="font-bold text-white flex items-center">
+                            <i class="fa-solid fa-earth-americas mr-1.5 text-sky-400 animate-spin"></i>
+                            <span>地理與經緯度常識提醒：</span>
+                        </p>
+                        <p>1. <strong>時差計算：</strong> 兩地相差 ${Math.abs(rawDiff)} 個時區（時差 ${Math.abs(rawDiff)} 小時）。目的地較出發地${rawDiff >= 0 ? '「快」' : '「慢」'} (UTC ${formattedDiffSign})。</p>
+                        <p>2. <strong>日期線提示：</strong> ${idlCrossMessage}</p>
+                    </div>
+
+                    <div class="space-y-2 text-xs pt-1">
+                        <p class="font-bold text-slate-300"><i class="fa-solid fa-code-compare mr-1.5 text-sky-400"></i>推導步驟解析：</p>
+                        <div class="p-3 bg-slate-900/60 rounded-xl space-y-2">
+                            <p><strong>步驟 1. 套用時區黃金公式：</strong><br>
+                            $$\\text{抵達時間 (當地)} = \\text{起飛時間 (當地)} + \\text{飛行時間} \\pm \\text{時差}$$
+                            我們將起飛地時間加上飛行小時：<br>
+                            $$\\text{起飛時間 } (${depLocalString}) + \\mathbf{${duration} \\text{ 小時}} = \\text{UTC ${depTz >= 0 ? '+' + depTz : depTz} 基準時間}$$
+                            </p>
+                            <p><strong>步驟 2. 進行時差校準：</strong><br>
+                            因為目標目的地是 UTC ${arrTz >= 0 ? '+' + arrTz : arrTz}，我們需要從起飛地調整 $${arrTz} - (${depTz}) = \\mathbf{${formattedDiffSign} \\text{ 小時}}$的時差。<br>
+                            調整時差後得到的目的地當地時間即為：<br>
+                            $$\\mathbf{${arrLocalString}}$$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            if (window.MathJax) {
+                MathJax.typesetPromise([output]);
+            }
+            showToast("時區抵達時間與步驟模擬完畢！");
         }
 
-        // Restore stored reflect text on load
+
+        // SECTION 4 Logic: Matching Game
+        const matchingData = [
+            { id: 'm1', concept: '平均房價 (ADR)', formula: '客房總收入 ÷ 已售出客房數目' },
+            { id: 'm2', concept: '可供出租客房收入 (RevPAR)', formula: '客房總收入 ÷ 可供出租客房總數' },
+            { id: 'm3', concept: '入住率 (Occupancy Rate)', formula: '(已售出客房數 ÷ 可供出租客房總數) × 100%' },
+            { id: 'm4', concept: '食物成本百分比法單價', formula: '食物原材料成本 ÷ 目標食物成本百分比' },
+            { id: 'm5', concept: '主要成本法單價 (Prime Cost)', formula: '(食物成本 + 直接人工成本) ÷ 目標主要成本百分比' },
+            { id: 'm6', concept: '國際日期線向東越過 (西經)', formula: '日期要減一天 (-1 Day)' },
+            { id: 'm7', concept: '國際日期線向西越過 (東經)', formula: '日期要加一天 (+1 Day)' }
+        ];
+
+        let selectedConceptId = null;
+        let selectedFormulaId = null;
+        let matchedPairs = new Set();
+
+        function initMatchingGame() {
+            selectedConceptId = null;
+            selectedFormulaId = null;
+            matchedPairs.clear();
+            document.getElementById('matching-success').classList.add('hidden');
+
+            const conceptsContainer = document.getElementById('col-concepts');
+            const formulasContainer = document.getElementById('col-formulas');
+
+            // Shuffle functions
+            const shuffleArray = (arr) => arr.slice().sort(() => Math.random() - 0.5);
+            
+            const shuffledConcepts = shuffleArray(matchingData);
+            const shuffledFormulas = shuffleArray(matchingData);
+
+            // Render Concepts (Left)
+            conceptsContainer.innerHTML = shuffledConcepts.map(item => `
+                <button id="concept-${item.id}" onclick="selectConcept('${item.id}')" class="match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
+                    <span>${item.concept}</span>
+                    <span class="match-dot w-2 h-2 rounded-full bg-slate-300"></span>
+                </button>
+            `).join('');
+
+            // Render Formulas (Right)
+            formulasContainer.innerHTML = shuffledFormulas.map(item => `
+                <button id="formula-${item.id}" onclick="selectFormula('${item.id}')" class="match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between">
+                    <span class="match-dot w-2 h-2 rounded-full bg-slate-300 mr-2"></span>
+                    <span>${item.formula}</span>
+                </button>
+            `).join('');
+        }
+
+        function selectConcept(id) {
+            if (matchedPairs.has(id)) return;
+
+            // Remove previous selection highlight
+            if (selectedConceptId) {
+                const prev = document.getElementById(`concept-${selectedConceptId}`);
+                if (prev) prev.className = "match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between";
+            }
+
+            selectedConceptId = id;
+            const current = document.getElementById(`concept-${id}`);
+            current.className = "match-card w-full text-left p-4 bg-indigo-50 border-2 border-indigo-500 rounded-2xl font-bold text-indigo-900 text-xs sm:text-sm flex items-center justify-between shadow-md";
+
+            // Check match if both selected
+            checkMatch();
+        }
+
+        function selectFormula(id) {
+            if (matchedPairs.has(id)) return;
+
+            if (selectedFormulaId) {
+                const prev = document.getElementById(`formula-${selectedFormulaId}`);
+                if (prev) prev.className = "match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between";
+            }
+
+            selectedFormulaId = id;
+            const current = document.getElementById(`formula-${id}`);
+            current.className = "match-card w-full text-left p-4 bg-indigo-50 border-2 border-indigo-500 rounded-2xl font-bold text-indigo-900 text-xs sm:text-sm flex items-center justify-between shadow-md";
+
+            checkMatch();
+        }
+
+        function checkMatch() {
+            if (selectedConceptId && selectedFormulaId) {
+                const conceptBtn = document.getElementById(`concept-${selectedConceptId}`);
+                const formulaBtn = document.getElementById(`formula-${selectedFormulaId}`);
+
+                if (selectedConceptId === selectedFormulaId) {
+                    // Match Success!
+                    matchedPairs.add(selectedConceptId);
+                    scores.matchingGame = matchedPairs.size;
+
+                    // Success styling
+                    conceptBtn.className = "match-card w-full text-left p-4 bg-emerald-50 border-2 border-emerald-500 text-emerald-900 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-between correct-pulse";
+                    formulaBtn.className = "match-card w-full text-left p-4 bg-emerald-50 border-2 border-emerald-500 text-emerald-900 rounded-2xl font-bold text-xs sm:text-sm flex items-center justify-between correct-pulse";
+                    
+                    conceptBtn.innerHTML += `<i class="fa-solid fa-check text-emerald-600"></i>`;
+                    formulaBtn.innerHTML = `<i class="fa-solid fa-check text-emerald-600 mr-2"></i>` + formulaBtn.innerHTML;
+
+                    conceptBtn.disabled = true;
+                    formulaBtn.disabled = true;
+
+                    showToast("配對成功！太棒了！", true, "fa-solid fa-thumbs-up text-emerald-400");
+                } else {
+                    // Match Failure
+                    conceptBtn.classList.add('wrong-shake', 'border-rose-500', 'bg-rose-50', 'text-rose-950');
+                    formulaBtn.classList.add('wrong-shake', 'border-rose-500', 'bg-rose-50', 'text-rose-950');
+                    
+                    showToast("配對不正確，再試一次！", false, "fa-solid fa-circle-xmark text-rose-400");
+
+                    const resetConcept = selectedConceptId;
+                    const resetFormula = selectedFormulaId;
+
+                    setTimeout(() => {
+                        const cb = document.getElementById(`concept-${resetConcept}`);
+                        const fb = document.getElementById(`formula-${resetFormula}`);
+                        if (cb && !matchedPairs.has(resetConcept)) {
+                            cb.className = "match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between";
+                        }
+                        if (fb && !matchedPairs.has(resetFormula)) {
+                            fb.className = "match-card w-full text-left p-4 bg-slate-50 border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 rounded-2xl font-semibold text-slate-800 text-xs sm:text-sm flex items-center justify-between";
+                        }
+                    }, 500);
+                }
+
+                // Reset temporary selection variables
+                selectedConceptId = null;
+                selectedFormulaId = null;
+
+                // Win Condition
+                if (matchedPairs.size === matchingData.length) {
+                    setTimeout(() => {
+                        document.getElementById('matching-success').classList.remove('hidden');
+                        showToast("恭喜解鎖全部配對！", true, "fa-solid fa-crown text-amber-400");
+                    }, 600);
+                }
+            }
+        }
+
+
+        // SECTION 5 Logic: Interactive Multiple Choice Arena
+        const mcQuestions = [
+            {
+                id: 1,
+                tag: '客房銷售指標',
+                question: '千禧大酒店擁有 200 間客房。昨晚實際入住客房為 150 間，錄得昨晚客房總銷售收入為 HKD $120,000。請計算千禧大酒店昨晚的入住率 (Occupancy Rate) 、平均房價 (ADR) 以及每間可供出租客房收入 (RevPAR)。',
+                options: [
+                    { key: 'A', text: '入住率: 75% | ADR: $800 | RevPAR: $600' },
+                    { key: 'B', text: '入住率: 75% | ADR: $600 | RevPAR: $800' },
+                    { key: 'C', text: '入住率: 80% | ADR: $800 | RevPAR: $640' },
+                    { key: 'D', text: '入住率: 75% | ADR: $800 | RevPAR: $800' }
+                ],
+                correct: 'A',
+                explanation: `
+                    <strong>答對了！標準解答步驟如下：</strong><br>
+                    1. <strong>入住率 (Occupancy Rate)：</strong><br>
+                    $$\\text{入住率} = \\frac{\\text{已售客房}}{\\text{可供客房總數}} = \\frac{150}{200} \\times 100\\% = 75\\%$$
+                    2. <strong>平均房價 (ADR)：</strong><br>
+                    $$\\text{ADR} = \\frac{\\text{總客房收入}}{\\text{已售客房}} = \\frac{\\$120,000}{150} = \\$800$$
+                    3. <strong>每間可供出租客房收入 (RevPAR)：</strong><br>
+                    $$\\text{RevPAR} = \\frac{\\text{總客房收入}}{\\text{可供客房總數}} = \\frac{\\$120,000}{200} = \\$600$$
+                    <em>或者：</em>$$\\text{RevPAR} = \\text{入住率 (75\\%)} \\times \\text{ADR (\\$800)} = \\$600$$
+                    <strong>🚨 陷阱警惕：</strong> DSE 考試最常在分母作怪！計算 ADR 時要除以賣出的房數（150），而計算 RevPAR 時要除以總房數（200）。
+                `
+            },
+            {
+                id: 2,
+                tag: '釐定餐單價格',
+                question: '翠華餐廳推出一道全新主菜「黑椒安格斯牛柳」。廚師計算得這盤牛柳的食材原料成本為 HKD $48。若餐廳經理設定的目標食物成本百分比為 32%，利用「食物成本百分比法」釐定的餐單定價應該是多少？',
+                options: [
+                    { key: 'A', text: 'HKD $15.36' },
+                    { key: 'B', text: 'HKD $96.00' },
+                    { key: 'C', text: 'HKD $150.00' },
+                    { key: 'D', text: 'HKD $200.00' }
+                ],
+                correct: 'C',
+                explanation: `
+                    <strong>答對了！標準解答步驟如下：</strong><br>
+                    1. <strong>套用公式：</strong><br>
+                    $$\\text{餐單價格} = \\frac{\\text{食物原料成本}}{\\text{目標食物成本百分比}}$$
+                    2. <strong>帶入數值：</strong><br>
+                    $$\\text{定價} = \\frac{\\$48}{32\\%} = \\frac{\\$48}{0.32} = \\mathbf{\\$150}$$
+                    <strong>🚨 陷阱警惕：</strong> 千萬不能把乘除搞混！有的同學會錯用 $48 \\times 32\\% = \\$15.36$ 這只是牛柳本身的原材料成本占比，不可能是售價！
+                `
+            },
+            {
+                id: 3,
+                tag: '釐定餐單價格',
+                question: '某星級扒房打算使用「主要成本法 (Prime Cost Method)」定價。已知一份沙朗牛排的食物成本為 $60，直接人工成本為 $40。若該餐廳預計的目標主要成本百分比為 40%，這道牛排的售價應定為多少？',
+                options: [
+                    { key: 'A', text: 'HKD $150' },
+                    { key: 'B', text: 'HKD $250' },
+                    { key: 'C', text: 'HKD $100' },
+                    { key: 'D', text: 'HKD $120' }
+                ],
+                correct: 'B',
+                explanation: `
+                    <strong>答對了！標準解答步驟如下：</strong><br>
+                    1. <strong>計算主要成本 (Prime Cost)：</strong><br>
+                    主要成本包括食材和直接勞工成本之和：<br>
+                    $$\\text{主要成本} = \\text{食物成本 (\\$60)} + \\text{直接人工成本 (\\$40)} = \\$100$$
+                    2. <strong>計算最終價格：</strong><br>
+                    $$\\text{價格} = \\frac{\\text{主要成本}}{\\text{目標主要成本百分比}} = \\frac{\\$100}{40\\%} = \\frac{\\$100}{0.4} = \\mathbf{\\$250}$$
+                    <strong>🚨 陷阱警惕：</strong> 有很多同學看到 40% 主要成本，便直接拿 $60 / 40\\% = 150$ 或者是 $40 / 40\\% = 100$，忘記了將食物成本與人工成本**兩者相加**！
+                `
+            },
+            {
+                id: 4,
+                tag: '時區與地理計算',
+                question: '一班直航客機於 10 月 1 日上午 10:00 從英國倫敦 (UTC+0) 起飛，前往中國北京 (UTC+8)。已知該航線的預估飛行時數為 11 小時，請計算客機抵達北京時的北京當地日期和時間。',
+                options: [
+                    { key: 'A', text: '10 月 1 日下午 9:00 (21:00)' },
+                    { key: 'B', text: '10 月 2 日清晨 5:00 (05:00)' },
+                    { key: 'C', text: '10 月 1 日晚上 11:00 (23:00)' },
+                    { key: 'D', text: '10 月 2 日清晨 1:00 (01:00)' }
+                ],
+                correct: 'B',
+                explanation: `
+                    <strong>答對了！時區題目黃金三步法：</strong><br>
+                    1. <strong>出發地時間：</strong> 10 月 1 日 10:00 (UTC+0)<br>
+                    2. <strong>加上飛行時間：</strong> 10:00 + 11 小時 = 10 月 1 日 21:00 (此時仍為倫敦時間)<br>
+                    3. <strong>換算目的地時差：</strong> 北京為 UTC+8，比倫敦快 8 小時（東加）。所以 21:00 + 8 小時 = 翌日 05:00 (10 月 2 日 05:00)<br>
+                    $$\\text{抵達時間} = 10:00 + 11\\text{h} + 8\\text{h} = 29:00 \\rightarrow \\text{翌日 05:00}$$
+                    <strong>🚨 陷阱警惕：</strong> 注意時間跨越 24 小時後日期必須自動增加一天！
+                `
+            },
+            {
+                id: 5,
+                tag: '時區與日期線',
+                question: '陳教授於 5 月 15 日上午 09:00 乘飛機自日本東京 (UTC+9) 出發，飛往美國洛杉磯 (UTC-8)。兩地航程共 10 小時，請問陳教授抵達洛杉磯國際機場時，當地的日期和時間是多少？',
+                options: [
+                    { key: 'A', text: '5 月 15 日下午 7:00 (19:00)' },
+                    { key: 'B', text: '5 月 15 日凌晨 2:00 (02:00)' },
+                    { key: 'C', text: '5 月 16 日清晨 7:00 (07:00)' },
+                    { key: 'D', text: '5 月 14 日上午 10:00 (10:00)' }
+                ],
+                correct: 'B',
+                explanation: `
+                    <strong>答對了！這道題跨越了 180° 國際日期變更線：</strong><br>
+                    1. <strong>計算出發時目的地洛杉磯的當地時間：</strong><br>
+                    東京為 UTC+9，洛杉磯為 UTC-8。時差為：$$9 - (-8) = 17\\text{小時}$$
+                    因為洛杉磯在西經，時間比東京慢 17 小時。<br>
+                    所以起飛時，洛杉磯當地時間為：<br>
+                    $$5\\text{月}15\\text{日 } 09:00 - 17\\text{小時} = 5\\text{月}14\\text{日 } 16:00 (\\text{下午 4 點})$$<br>
+                    2. <strong>加上飛行時間：</strong><br>
+                    $$5\\text{月}14\\text{日 } 16:00 + 10 \\text{小時} = 5\\text{月}15\\text{日 } 02:00 (\\text{凌晨 2 點})$$<br>
+                    這完美的驗證了向東跨越國際日期變更線（西經），「日期減一天」的時間倒流體驗！
+                </div>
+                `
+            }
+        ];
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = mcQuestions.map((q, idx) => `
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200 space-y-4 transition-all" id="q-card-${q.id}">
+                    <div class="flex items-center justify-between">
+                        <span class="px-2.5 py-0.5 bg-brand-100 text-brand-800 border border-brand-200 rounded-full text-xs font-bold font-mono">
+                            題號 ${q.id} : ${q.tag}
+                        </span>
+                        <button onclick="readAloudText('題目 ${q.id}。${q.question.replace(/\$/g, '')}')" class="text-xs text-brand-600 hover:text-brand-800 flex items-center space-x-1">
+                            <i class="fa-solid fa-volume-high"></i>
+                            <span>朗讀題目</span>
+                        </button>
+                    </div>
+
+                    <p class="text-slate-800 font-bold text-sm sm:text-base leading-relaxed">
+                        ${q.question}
+                    </p>
+
+                    <!-- Options -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        ${q.options.map(opt => `
+                            <button onclick="submitAnswer(${q.id}, '${opt.key}')" id="btn-${q.id}-${opt.key}" class="mc-option-btn text-left p-4 bg-white border border-slate-300 hover:border-brand-500 hover:bg-brand-50/20 rounded-xl text-xs sm:text-sm transition-all flex items-center justify-between group">
+                                <span class="font-semibold text-slate-700 group-hover:text-slate-900">${opt.key}. ${opt.text}</span>
+                                <span class="radio-dot w-4 h-4 rounded-full border border-slate-300 flex items-center justify-center text-[10px] text-white"></span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Instant Feedback Section (Hidden at first) -->
+                    <div id="feedback-${q.id}" class="hidden p-4 rounded-xl text-xs leading-relaxed transition-all">
+                        <!-- Explanations in details -->
+                    </div>
+                </div>
+            `).join('');
+
+            // Render math inside descriptions
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]);
+            }
+        }
+
+        function submitAnswer(qId, selectedKey) {
+            // If already answered, do nothing
+            if (scores.mcQuestions[qId]) return;
+
+            const question = mcQuestions.find(q => q.id === qId);
+            const feedbackBox = document.getElementById(`feedback-${qId}`);
+            
+            // Set answered status
+            scores.mcQuestions[qId] = selectedKey;
+
+            // Highlight chosen option
+            const chosenBtn = document.getElementById(`btn-${qId}-${selectedKey}`);
+            const correctBtn = document.getElementById(`btn-${qId}-${question.correct}`);
+
+            // Disable all buttons in this question card
+            document.querySelectorAll(`#q-card-${qId} .mc-option-btn`).forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-70');
+            });
+
+            if (selectedKey === question.correct) {
+                // Correct!
+                chosenBtn.className = "mc-option-btn text-left p-4 bg-emerald-50 border-2 border-emerald-500 text-emerald-900 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-between";
+                chosenBtn.querySelector('.radio-dot').className = "radio-dot w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] text-white";
+                chosenBtn.querySelector('.radio-dot').innerHTML = '<i class="fa-solid fa-check"></i>';
+                
+                feedbackBox.className = "p-4 bg-emerald-50 border border-emerald-200 text-emerald-950 rounded-xl text-xs leading-relaxed space-y-2 mt-4 block correct-pulse";
+                feedbackBox.innerHTML = `<p class="font-bold text-emerald-800 text-sm flex items-center"><i class="fa-solid fa-circle-check mr-1.5"></i> 答對了！恭喜！</p> ${question.explanation}`;
+                showToast("回答正確！", true);
+            } else {
+                // Incorrect!
+                chosenBtn.className = "mc-option-btn text-left p-4 bg-rose-50 border-2 border-rose-500 text-rose-900 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-between wrong-shake";
+                chosenBtn.querySelector('.radio-dot').className = "radio-dot w-4 h-4 rounded-full bg-rose-500 flex items-center justify-center text-[10px] text-white";
+                chosenBtn.querySelector('.radio-dot').innerHTML = '<i class="fa-solid fa-xmark"></i>';
+
+                correctBtn.className = "mc-option-btn text-left p-4 bg-emerald-50 border border-emerald-500 text-emerald-900 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-between opacity-100";
+                correctBtn.querySelector('.radio-dot').className = "radio-dot w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center text-[10px] text-white";
+                correctBtn.querySelector('.radio-dot').innerHTML = '<i class="fa-solid fa-check"></i>';
+
+                feedbackBox.className = "p-4 bg-rose-50 border border-rose-200 text-slate-800 rounded-xl text-xs leading-relaxed space-y-2 mt-4 block";
+                feedbackBox.innerHTML = `<p class="font-bold text-rose-800 text-sm flex items-center"><i class="fa-solid fa-circle-exclamation mr-1.5"></i> 答錯了，正確答案是 ${question.correct}</p> ${question.explanation}`;
+                showToast("答錯囉，看個算式原理吧！", false);
+            }
+
+            // Math rendering on newly shown feedback
+            if (window.MathJax) {
+                MathJax.typesetPromise([feedbackBox]);
+            }
+
+            updateQuizProgress();
+        }
+
+        function updateQuizProgress() {
+            const answeredCount = Object.keys(scores.mcQuestions).length;
+            let correctCount = 0;
+
+            mcQuestions.forEach(q => {
+                if (scores.mcQuestions[q.id] === q.correct) {
+                    correctCount++;
+                }
+            });
+
+            // Update Badge text
+            document.getElementById('quiz-badge').innerText = `得分率：${correctCount} / 5`;
+
+            // If all answered, show evaluation panel
+            if (answeredCount === mcQuestions.length) {
+                const pct = (correctCount / mcQuestions.length) * 100;
+                document.getElementById('quiz-summary').classList.remove('hidden');
+                document.getElementById('quiz-final-score').innerText = `${pct.toFixed(0)}%`;
+                document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
+
+                let evalText = "";
+                if (pct === 100) {
+                    evalText = "🏆 完美！你簡直是 DSE 款待計算之王！三大核心計算（房務、餐飲定價、時區）你已經全部掌握， DSE 這個部分穩拿滿分！";
+                } else if (pct >= 60) {
+                    evalText = "🌟 很不錯的成績！你對大部份公式都有清晰的了解。建議多留意那些做錯題目的詳解與陷阱提醒，補齊死角就能衝刺 5** 囉！";
+                } else {
+                    evalText = "📚 計算還不夠熟練喔！別擔心，旅款科的計算不難，只是需要反覆推導。建議多去使用「核心模擬計算沙盒」隨機更改數值，了解公式內在規律！";
+                }
+                document.getElementById('quiz-evaluation').innerText = evalText;
+            }
+        }
+
+
+        // SECTION 6 Logic: Export Notes
+        function exportStudyNotes() {
+            const q1Answer = document.getElementById('reflect-q1').value.trim();
+            const q2Answer = document.getElementById('reflect-q2').value.trim();
+
+            const completedMC = Object.keys(scores.mcQuestions).length;
+            let correctMC = 0;
+            mcQuestions.forEach(q => {
+                if (scores.mcQuestions[q.id] === q.correct) {
+                    correctMC++;
+                }
+            });
+
+            // Format study sheet content
+            const notesText = `=====================================================
+    DSE 旅遊與款待科及地理科：計算真簡單！專屬複習備忘錄
+=====================================================
+產出時間：2026 年
+學習目標：客房銷售指標、餐單定價、時區日期線計算
+-----------------------------------------------------
+
+【當前學習進度報告】
+1. 公式配對活動解鎖率：${scores.matchingGame} / 7 
+2. DSE 模擬練習挑戰進度：已回答 ${completedMC} 題 / 答對 ${correctMC} 題
+3. 答題得分率：${completedMC > 0 ? ((correctMC / completedMC) * 100).toFixed(0) : 0}%
+
+-----------------------------------------------------
+【三大核心考點：黃金公式與陷阱筆記】
+
+單元一：客房銷售與指標 (房務部)
+* 入住率 (Occupancy Rate) = (已售客房數 / 可供出租客房數) * 100%
+* 平均房價 (ADR) = 客房總收入 / 已售出客房數 (※ 分母必為已售房！)
+* 每間可供出租客房收入 (RevPAR) = 客房總收入 / 可供出租客房總數 
+                               = 入住率 * ADR (※ 分母為全部可出租房！)
+
+單元二：釐定餐單價格 (餐飲部)
+* 食物成本百分比法：定價 = 食物原料成本 / 目標食物成本百分比
+* 主要成本法 (Prime Cost)：定價 = 主要成本 / 目標主要成本百分比
+  ※ DSE陷阱：主要成本 = 「食物原料成本」 + 「直接人工成本」之和！
+
+單元三：時區與日期線計算
+* 地球每 15 度經度 = 1 小時時差。本初子午線為基準 UTC 0。
+* 時區計算口訣：東加西減（目的地在東經則加時，在西經則減時）。
+* 國際日期線變更規則：
+  - 向東越過 (亞洲飛美洲 / 西經)：日期減一天 (-1 Day)
+  - 向西越過 (美洲飛亞洲 / 東經)：日期加一天 (+1 Day)
+* 航班抵達公式：目的地抵達時間 = 起飛地時間 + 飛行時數 +/- 時差。
+
+-----------------------------------------------------
+【自主學習反思與記錄】
+
+Q1. 經過本次學習，你認為在計算客房銷售指標 (RevPAR) 時，最關鍵且最容易混淆的盲點是什麼？你將如何避免？
+你的回答：
+${q1Answer ? q1Answer : '（尚未填寫此反思答案）'}
+
+Q2. 面對地理或旅款科最繁複的「跨越國際日期變更線時區計算」，你現在掌握的解題步驟是什麼？
+你的回答：
+${q2Answer ? q2Answer : '（尚未填寫此反思答案）'}
+
+-----------------------------------------------------
+祝你在 DSE 考試中勇奪佳績，計算題一分不丟！💪💪💪
+=====================================================`;
+
+            // Export to .txt file via client browser download
+            const blob = new Blob([notesText], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `DSE_旅款計算全攻略_複習筆記_${new Date().toISOString().split('T')[0]}.txt`;
+            link.click();
+
+            showToast("成功導出複習備忘錄！請至下載資料夾查收！", true, "fa-solid fa-file-arrow-down text-emerald-400");
+        }
+
+
+        // Window initialization
         window.onload = function() {
-            if(localStorage.getItem('tourism_reflect_1')) {
-                document.getElementById('reflect-1').value = localStorage.getItem('tourism_reflect_1');
-            }
-            if(localStorage.getItem('tourism_reflect_2')) {
-                document.getElementById('reflect-2').value = localStorage.getItem('tourism_reflect_2');
-            }
-        }
+            // Render Dynamic Components
+            initMatchingGame();
+            renderQuiz();
 
+            // Perform default initial calculations for Sandboxes so they aren't empty on load
+            calculateHotelKPIs();
+            calculateMenuPricing();
+            calculateFlightTime();
+
+            showToast("系統加載成功！歡迎開始學習！");
+        };
     </script>
 </body>
 </html>
